@@ -19,5 +19,7 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        # Ultahost primary directory is usually public_html
         server-dir: ./public_html/
+        # Add these two lines to bypass the network reset:
+        port: 21
+        protocol: ftp
