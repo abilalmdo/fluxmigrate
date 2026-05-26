@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FluxMigrate | Cloud Architecture, Migration & Enterprise Operations</title>
+    <!-- Tailwind CSS for Advanced Layouts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 antialiased scroll-smooth">
+
+    <!-- Sticky Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i data-lucide="refresh-cw" class="h-6 w-6 text-blue-500 animate-spin-slow"></i>
+                <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">FluxMigrate</span>
+            </div>
+            <nav class="hidden lg:flex space-x-6 text-sm font-medium text-slate-300">
+                <a href="#architecture" class="hover:text-blue-400 transition-colors">Architecture & Integration</a>
+                <a href="#migration" class="hover:text-blue-400 transition-colors">Migration & Ops</a>
+                <a href="#datacenter" class="hover:text-blue-400 transition-colors">DataCenter</a>
+                <a href="#maintenance" class="hover:text-blue-400 transition-colors">Maintenance</a>
+                <a href="#specialized" class="hover:text-blue-400 transition-colors">SaaS & Apps</a>
+            </nav>
+            <div>
+                <a href="#contact" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors shadow-lg shadow-blue-600/20">
+                    Request Assessment
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-20 pb-16 md:pt-28 md:pb-24 overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.1),transparent_50%)]"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="max-w-4xl">
+                <div class="inline-flex items-center space-x-2 bg-blue-900/40 border border-blue-800/60 rounded-full px-3 py-1 text-xs font-medium text-blue-400 mb-6">
+                    <span class="flex h-2 w-2 rounded-full bg-blue-400 animate-pulse"></span>
+                    <span>Multi-Cloud, Hybrid Ecosystems & DevOps Mastery</span>
+                </div>
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-none mb-6">
+                    Cloud Architecture, Deployment & <span class="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Seamless Integration.</span>
+                </h1>
+                <p class="text-lg text-slate-400 font-normal leading-relaxed mb-8 max-w-3xl">
+                    FluxMigrate designs, builds, and maintains robust, secure, and optimized cloud infrastructures across multiple environments. We eliminate vendor lock-in, automate cloud operations, and sustain reliable enterprise workloads with zero friction.
+                </p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#contact" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 font-medium text-white transition-all shadow-lg shadow-blue-600/25">
+                        Launch Free Discovery Call
+                    </a>
+                    <a href="#architecture" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-slate-800 hover:bg-slate-700/80 font-medium text-slate-300 border border-slate-700 transition-all">
+                        View Core Capabilities
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 1: Cloud Architecture Deployment and Integration -->
+    <section id="architecture" class="py-20 bg-slate-900/50 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-white tracking-tight sm:text-4xl mb-4">Cloud Architecture Deployment & Integration</h2>
+                <p class="text-slate-400 max-w-3xl">Keeping your cloud infrastructure robust, secure, and optimized while facilitating seamless integration across multiple platforms and environments.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-slate-800/40 border border-slate-800/60 p-6 rounded-xl">
+                    <div class="text-blue-400 mb-4"><i data-lucide="layers"></i></div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Architecture Design</h3>
+                    <p class="text-slate-400 text-sm">Building secure, scalable, and cost-efficient cloud infrastructures aligned with business needs.</p>
+                </div>
+                <div class="bg-slate-800/40 border border-slate-800/60 p-6 rounded-xl">
+                    <div class="text-blue-400 mb-4"><i data-lucide="git-branch"></i></div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Multi-Cloud & Hybrid Strategy</h3>
+                    <p class="text-slate-400 text-sm">Designing solutions across VMware, Ovirt/OLVM, OpenStack, AWS, Azure, GCP, OpenShift, Kubernetes and on-premises.</p>
+                </div>
+                <div class="bg-slate-800/40 border border-slate-800/60 p-6 rounded-xl">
+                    <div class="text-blue-400 mb-4"><i data-lucide="trending-down"></i></div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Cost Optimization</h3>
+                    <p class="text-slate-400 text-sm">Implementing strategies to reduce cloud spend while maintaining performance and scalability.</p>
+                </div>
+                <div class="bg-slate-800/40 border border-slate-800/60 p-6 rounded-xl">
+                    <div class="text-blue-400 mb-4"><i data-lucide="shield"></i></div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Cloud Security Services</h3>
+                    <p class="text-slate-400 text-sm">Robust, proactive security tailored to each client’s specific environment and infrastructure layout.</p>
+                </div>
+                <div class="bg-slate-800/40 border border-slate-800/60 p-6 rounded-xl">
+                    <div class="text-blue-400 mb-4"><i data-lucide="activity"></i></div>
+                    <h3 class="text-lg font-semibold text-white mb-2">High Availability & DR</h3>
+                    <p class="text-slate-400 text-sm">Ensoring business continuity with resilient fault-tolerant architectures and advanced failover strategies.</p>
+                </div>
+                <div class="bg-slate-800/40 border border-slate-800/60 p-6 rounded-xl">
+                    <div class="text-blue-400 mb-4"><i data-lucide="cpu"></i></div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Application Modernization</h3>
+                    <p class="text-slate-400 text-sm">Supporting microservices, containers, and serverless adoption for future-ready applications.</p>
+                </div>
+            </div>
+
+            <!-- Inline list of supplementary architectural disciplines -->
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-6 border-t border-slate-800/60 text-sm text-slate-300">
+                <div class="flex items-center space-x-3"><i data-lucide="check" class="text-emerald-500 h-4 w-4"></i><span>Compliance Management</span></div>
+                <div class="flex items-center space-x-3"><i data-lucide="check" class="text-emerald-500 h-4 w-4"></i><span>Application Performance Optimization</span></div>
+                <div class="flex items-center space-x-3"><i data-lucide="check" class="text-emerald-500 h-4 w-4"></i><span>Governance & Framework Best Practices</span></div>
+                <div class="flex items-center space-x-3"><i data-lucide="check" class="text-emerald-500 h-4 w-4"></i><span>Cloud Integration & Seamless Data Flows</span></div>
+                <div class="flex items-center space-x-3"><i data-lucide="check" class="text-emerald-500 h-4 w-4"></i><span>Proactive Monitoring & System Hardening</span></div>
+                <div class="flex items-center space-x-3"><i data-lucide="check" class="text-emerald-500 h-4 w-4"></i><span>Custom API Integration</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: Cloud Migration and Cloud Ops -->
+    <section id="migration" class="py-20 bg-slate-950/40 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold text-white tracking-tight sm:text-4xl mb-4">Cloud Migration & Cloud Ops</h2>
+                    <p class="text-slate-400 mb-6">
+                        We specialize in migrating legacy systems, optimizing cloud environments, and implementing robust operational strategies tailored to your specific business needs. By leveraging cutting-edge tools and frameworks, we ensure secure, scalable, and efficient ecosystems that reduce operational overhead.
+                    </p>
+                    
+                    <h4 class="text-sm font-semibold uppercase tracking-wider text-blue-400 mb-3">Comprehensive Migration Expertise</h4>
+                    <ul class="space-y-2 text-sm text-slate-300 mb-6">
+                        <li class="flex items-center space-x-2"><i data-lucide="arrow-right" class="text-blue-500 h-4 w-4"></i><span>Migrate complex legacy systems to modern cloud environments</span></li>
+                        <li class="flex items-center space-x-2"><i data-lucide="arrow-right" class="text-blue-500 h-4 w-4"></i><span>Transition workloads between public providers (AWS ↔ Azure ↔ GCP)</span></li>
+                        <li class="flex items-center space-x-2"><i data-lucide="arrow-right" class="text-blue-500 h-4 w-4"></i><span>Seamlessly move infrastructure from on-premises to cloud and vice versa</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-8 rounded-xl space-y-6">
+                    <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3">Strategic Operational Frameworks</h3>
+                    
+                    <div class="flex gap-4">
+                        <div class="text-indigo-400"><i data-lucide="calendar"></i></div>
+                        <div>
+                            <h4 class="text-base font-semibold text-white">Cloud Migration Planning</h4>
+                            <p class="text-slate-400 text-sm">Detailed roadmaps and structured, phased migration plans to minimize downtime during onboarding or offboarding.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-indigo-400"><i data-lucide="terminal"></i></div>
+                        <div>
+                            <h4 class="text-base font-semibold text-white">Automated Cloud Operations</h4>
+                            <p class="text-slate-400 text-sm">Implementation of CI/CD pipelines, Infrastructure as Code (IaC), and intelligent monitoring for error-free operations.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-indigo-400"><i data-lucide="lock"></i></div>
+                        <div>
+                            <h4 class="text-base font-semibold text-white">Security-First Architecture</h4>
+                            <p class="text-slate-400 text-sm">Multi-layered security protocols and continuous real-time tracking for uninterrupted operations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: DataCenter Operations -->
+    <section id="datacenter" class="py-20 bg-slate-900/50 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl font-bold text-white tracking-tight sm:text-4xl mb-4">On-Premises DataCenter Operations</h2>
+                <p class="text-slate-400">Bridging bare-metal physical environments with next-generation automated infrastructure orchestration.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="p-6 bg-slate-950/40 border border-slate-800/80 rounded-xl">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2 mb-3">
+                        <i data-lucide="hard-drive" class="text-purple-400 h-5 w-5"></i> Infrastructure Management
+                    </h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Provisioning, monitoring, and maintaining physical servers (HP, DELL, etc.), enterprise storage arrays, and network cores to optimize resource utilization.</p>
+                </div>
+                <div class="p-6 bg-slate-950/40 border border-slate-800/80 rounded-xl">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2 mb-3">
+                        <i data-lucide="history" class="text-purple-400 h-5 w-5"></i> Legacy System Support
+                    </h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Maintain and modernize legacy applications and platforms, integrating them cleanly with modern cloud solutions while preserving core data functionality.</p>
+                </div>
+                <div class="p-6 bg-slate-950/40 border border-slate-800/80 rounded-xl">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2 mb-3">
+                        <i data-lucide="sliders" class="text-purple-400 h-5 w-5"></i> Operational Automation
+                    </h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Utilizing advanced configuration management mechanisms (Ansible, Puppet) for uniform node deployments, automated patching, and updates.</p>
+                </div>
+                <div class="p-6 bg-slate-950/40 border border-slate-800/80 rounded-xl">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2 mb-3">
+                        <i data-lucide="shield-alert" class="text-purple-400 h-5 w-5"></i> Security & Compliance
+                    </h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Enforcing parameter protection, localized endpoint controls, and automated data-protection boundaries mapped to regulatory standards.</p>
+                </div>
+                <div class="p-6 bg-slate-950/40 border border-slate-800/80 rounded-xl">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2 mb-3">
+                        <i data-lucide="database" class="text-purple-400 h-5 w-5"></i> DR & Failover Redundancy
+                    </h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Rigorous planning and regular execution testing for sudden hardware outages to guarantee high availability and data redundancy.</p>
+                </div>
+                <div class="p-6 bg-slate-950/40 border border-slate-800/80 rounded-xl">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2 mb-3">
+                        <i data-lucide="network" class="text-purple-400 h-5 w-5"></i> Hybrid Integration Readiness
+                    </h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Preparing standard legacy topologies for modern hybrid frameworks, assuring complete workload mobility between on-premises and clouds.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: Maintenance and Support (Interactive Matrix) -->
+    <section id="maintenance" class="py-20 bg-slate-950/40 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12 text-center lg:text-left">
+                <h2 class="text-3xl font-bold text-white tracking-tight sm:text-4xl mb-3">Comprehensive Maintenance & Support Matrix</h2>
+                <p class="text-slate-400">Continuous operation across all tiers. Click the tabs below to explore our targeted environment frameworks.</p>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-4 mb-8 justify-center lg:justify-start">
+                <button onclick="switchTab('core')" id="btn-core" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white transition-all">Core Maintenance Services</button>
+                <button onclick="switchTab('public')" id="btn-public" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-400 hover:bg-slate-700 transition-all">Public Cloud Support</button>
+                <button onclick="switchTab('private')" id="btn-private" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-400 hover:bg-slate-700 transition-all">Private Cloud Support</button>
+                <button onclick="switchTab('cross')" id="btn-cross" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-400 hover:bg-slate-700 transition-all">Cross-Cloud & Hybrid</button>
+            </div>
+
+            <!-- Tab Content 1: Core -->
+            <div id="tab-core" class="tab-content active bg-slate-900 border border-slate-800 p-8 rounded-xl">
+                <h3 class="text-xl font-bold text-white mb-6">Core Maintenance Services</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="text-base font-semibold text-blue-400 mb-2">Infrastructure Health Checks</h4>
+                        <p class="text-slate-400 text-sm">Regular audits of compute, storage, and network resources coupled with precise capacity planning.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-semibold text-blue-400 mb-2">Patch Management</h4>
+                        <p class="text-slate-400 text-sm">Timely OS and application patching across cloud platforms with manual controls in private cloud stacks.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-semibold text-blue-400 mb-2">Backup & Disaster Recovery</h4>
+                        <p class="text-slate-400 text-sm">Scheduled backups with structural versioning and geo-redundancy built around strict RTO/RPO compliance.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 2: Public Cloud -->
+            <div id="tab-public" class="tab-content bg-slate-900 border border-slate-800 p-8 rounded-xl">
+                <h3 class="text-xl font-bold text-white mb-4">Public Cloud Support (AWS, Azure, GCP)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="text-base font-semibold text-indigo-400 mb-2">Managed Service Monitoring</h4>
+                        <p class="text-slate-400 text-sm">Real-time tracking of native elements and APIs using tools like CloudWatch, Azure Monitor, and GCP Ops Suite.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-semibold text-indigo-400 mb-2">Cost & Billing Support</h4>
+                        <p class="text-slate-400 text-sm">Resource tagging, rightsizing, reserved instance planning, and predictive alerts for budget thresholds.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-semibold text-indigo-400 mb-2">Security Oversight</h4>
+                        <p class="text-slate-400 text-sm">IAM configuration audits, forced encryption deployment, and strict compliance mapping (HIPAA, GDPR, etc.).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 3: Private Cloud -->
+            <div id="tab-private" class="tab-content bg-slate-900 border border-slate-800 p-8 rounded-xl">
+                <h3 class="text-xl font-bold text-white mb-4">Private Cloud Support (VMware, OpenStack, etc.)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="text-base font-semibold text-purple-400 mb-2">Hardware Lifecycle Management</h4>
+                        <p class="text-slate-400 text-sm">Direct monitoring of physical node architectures, storage arrays, active hypervisors, and firmware management.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-semibold text-purple-400 mb-2">Custom SLA Tracking</h4>
+                        <p class="text-slate-400 text-sm">Tailored latency thresholds, specific uptime guarantees, and dedicated escalation queues for mission-critical workloads.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-semibold text-purple-400 mb-2">On-Prem Interfaces</h4>
+                        <p class="text-slate-400 text-sm">Sustaining secure multi-tier configurations, localized legacy endpoints, VPNs, and direct connection pipelines.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 4: Cross Cloud -->
+            <div id="tab-cross" class="tab-content bg-slate-900 border border-slate-800 p-8 rounded-xl">
+                <h3 class="text-xl font-bold text-white mb-4">Cross-Cloud & Hybrid Support</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-base font-semibold text-emerald-400 mb-2">Migration Operations Support</h4>
+                        <p class="text-slate-400 text-sm">Dedicated engineering assistance when actively transitioning payloads and compute maps across divergent cloud topologies.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-semibold text-emerald-400 mb-2">Unified Response Dashboards</h4>
+                        <p class="text-slate-400 text-sm">Centralized telemetry layers for multi-cloud environmental visibility alongside 24/7 incident management protocols.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SECTION 5: SaaS, Cloud Applications & DevOps -->
+    <section id="specialized" class="py-20 bg-slate-900/30 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl font-bold text-white tracking-tight sm:text-4xl mb-4">Modern Cloud Application Systems & DevOps</h2>
+                <p class="text-slate-400">Leveraging tools like OpenShift, Kubernetes, Terraform, and Docker to craft high-performing application ecosystems.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Column 1: SaaS Platform Solutions -->
+                <div class="bg-slate-950/60 border border-slate-800 p-6 rounded-xl">
+                    <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3 mb-4 flex items-center gap-2">
+                        <i data-lucide="package" class="text-blue-400"></i> SaaS Specialization
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-400">
+                        <li><strong class="text-slate-200">Platform Development:</strong> Design flexible, scalable layouts built for rapid deployment.</li>
+                        <li><strong class="text-slate-200">API Engineering:</strong> Establish clean, robust API connections to accommodate third-party systems.</li>
+                        <li><strong class="text-slate-200">Access Frameworks:</strong> Granular user management and highly customizable identity access control matrices.</li>
+                        <li><strong class="text-slate-200">Analytics Insights:</strong> Data analytical monitoring designed for data-driven adjustments.</li>
+                    </ul>
+                </div>
+
+                <!-- Column 2: Cloud Applications -->
+                <div class="bg-slate-950/60 border border-slate-800 p-6 rounded-xl">
+                    <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3 mb-4 flex items-center gap-2">
+                        <i data-lucide="cloud-lightning" class="text-indigo-400"></i> Cloud Applications
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-400">
+                        <li><strong class="text-slate-200">Cloud-Native Focus:</strong> Heavy emphasis on high-performance serverless structure and microservices containerization.</li>
+                        <li><strong class="text-slate-200">Disruption-Free Migration:</strong> Optimize workloads while maintaining persistent operational flow during offboarding or transitions.</li>
+                        <li><strong class="text-slate-200">Advanced Security:</strong> Native encryption layers and rigorous compliance mapping with GDPR, HIPAA, and ISO standards.</li>
+                        <li><strong class="text-slate-200">Elastic Allocation:</strong> Dynamic auto-scaling policies paired with pay-as-you-go provisioning models to optimize ROI.</li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: DevOps Framework Automation -->
+                <div class="bg-slate-950/60 border border-slate-800 p-6 rounded-xl">
+                    <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3 mb-4 flex items-center gap-2">
+                        <i data-lucide="terminal" class="text-purple-400"></i> DevOps Pipeline
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-400">
+                        <li><strong class="text-slate-200">Automated CI/CD Pipelines:</strong> Streamline software deployments for faster, secure, and predictable code delivery cycles.</li>
+                        <li><strong class="text-slate-200">Infrastructure as Code:</strong> Managing complex system architectures purely through software execution sets to assure multi-region scaling symmetry.</li>
+                        <li><strong class="text-slate-200">Monitoring & Logging:</strong> Central real-time dashboards tracking system anomalies to provide early problem mitigation.</li>
+                        <li><strong class="text-slate-200">Compliance Embedding:</strong> Injecting automated validation scripts right into baseline cloud resource models.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Unified Inquiry Assessment Form -->
+    <section id="contact" class="py-20 border-t border-slate-800 bg-slate-950/50">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white tracking-tight sm:text-4xl mb-4">Initiate Your Infrastructure Lifecycle</h2>
+                <p class="text-slate-400">Connect with FluxMigrate today to deploy resilient, highly available cloud systems engineered around your technical criteria.</p>
+            </div>
+            <form class="space-y-6 bg-slate-900 border border-slate-800 p-8 rounded-xl shadow-2xl">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-2">Corporate Identity</label>
+                        <input type="text" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500" placeholder="Engineering Lead">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-2">Corporate Routing Email</label>
+                        <input type="email" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500" placeholder="infra@enterprise.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Operational Dimension Request</label>
+                    <select class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-300 focus:outline-none focus:border-blue-500">
+                        <option>Cloud Architecture Deployment and Integration</option>
+                        <option>Comprehensive Legacy Cloud Migration</option>
+                        <option>DataCenter Physical Infrastructure Support</option>
+                        <option>Continuous SLA Cloud Maintenance Matrix</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Topology Requirements Brief</label>
+                    <textarea rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500" placeholder="Outline hypervisor environments, node footprints, or structural multi-VRF constraints..."></textarea>
+                </div>
+                <button type="submit" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg bg-blue-600 hover:bg-blue-500 text-base font-medium text-white transition-all shadow-lg shadow-blue-600/20">
+                    Submit Pipeline Assessment
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Simple Footer -->
+    <footer class="bg-slate-950 py-12 border-t border-slate-900 text-sm text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <div class="flex items-center space-x-2">
+                <i data-lucide="refresh-cw" class="h-5 w-5 text-slate-600"></i>
+                <span class="font-bold text-slate-400">fluxmigrate.com</span>
+                <span class="text-xs text-slate-600 ml-2">© 2026 Architectural Engineering.</span>
+            </div>
+            <div class="flex space-x-6 text-xs">
+                <a href="#" class="hover:text-slate-300 transition-colors">Privacy Map</a>
+                <a href="#" class="hover:text-slate-300 transition-colors">Terms of Operations</a>
+                <a href="#contact" class="hover:text-slate-300 transition-colors">SLA Support Hub</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Script Layer for Tab Changes & Icons -->
+    <script>
+        // Initialize Lucide SVG System Icons
+        lucide.createIcons();
+
+        // Interactive Tab Selector Engine for Maintenance Matrix
+        function switchTab(tabId) {
+            // Hide all active tab bodies
+            const items = document.querySelectorAll('.tab-content');
+            items.forEach(el => el.classList.remove('active'));
+
+            // Reset tab button selections
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-slate-800', 'text-slate-400', 'hover:bg-slate-700');
+            });
+
+            // Make the targeted content card block visible
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            // Toggle visual state on the targeted selection button
+            const selectedButton = document.getElementById('btn-' + tabId);
+            selectedButton.classList.remove('bg-slate-800', 'text-slate-400', 'hover:bg-slate-700');
+            selectedButton.classList.add('bg-blue-600', 'text-white');
+        }
+    </script>
+</body>
+</html>
