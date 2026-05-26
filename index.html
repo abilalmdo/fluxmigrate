@@ -364,20 +364,20 @@
                 <h2 class="text-3xl font-bold text-white tracking-tight sm:text-4xl mb-4">Initiate Your Infrastructure Lifecycle</h2>
                 <p class="text-slate-400">Connect with FluxMigrate today to deploy resilient, highly available cloud systems engineered around your technical criteria.</p>
             </div>
-            <form class="space-y-6 bg-slate-900 border border-slate-800 p-8 rounded-xl shadow-2xl">
+            <form id="contact-form" onsubmit="return handleContactSubmit(event)" class="space-y-6 bg-slate-900 border border-slate-800 p-8 rounded-xl shadow-2xl">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-slate-400 mb-2">Corporate Identity</label>
-                        <input type="text" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500" placeholder="Engineering Lead">
+                        <input name="name" type="text" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500" placeholder="Engineering Lead">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-400 mb-2">Corporate Routing Email</label>
-                        <input type="email" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500" placeholder="infra@enterprise.com">
+                        <input name="email" type="email" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500" placeholder="infra@enterprise.com">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-400 mb-2">Operational Dimension Request</label>
-                    <select class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-300 focus:outline-none focus:border-blue-500">
+                    <select name="service" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-300 focus:outline-none focus:border-blue-500">
                         <option>Cloud Architecture Deployment and Integration</option>
                         <option>Comprehensive Legacy Cloud Migration</option>
                         <option>DataCenter Physical Infrastructure Support</option>
@@ -386,7 +386,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-400 mb-2">Topology Requirements Brief</label>
-                    <textarea rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500" placeholder="Outline hypervisor environments, node footprints, or structural multi-VRF constraints..."></textarea>
+                    <textarea name="message" rows="4" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500" placeholder="Outline hypervisor environments, node footprints, or structural multi-VRF constraints..."></textarea>
                 </div>
                 <button type="submit" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg bg-blue-600 hover:bg-blue-500 text-base font-medium text-white transition-all shadow-lg shadow-blue-600/20">
                     Submit Pipeline Assessment
@@ -436,6 +436,27 @@
             const selectedButton = document.getElementById('btn-' + tabId);
             selectedButton.classList.remove('bg-slate-800', 'text-slate-400', 'hover:bg-slate-700');
             selectedButton.classList.add('bg-blue-600', 'text-white');
+        }
+
+        // Build a mailto link and open the user's email client
+        function handleContactSubmit(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('contact-form');
+            const subject = encodeURIComponent('FluxMigrate Inquiry from ' + form.name.value.trim());
+            const body = encodeURIComponent([
+                'Name: ' + form.name.value.trim(),
+                'Email: ' + form.email.value.trim(),
+                'Requested Service: ' + form.service.value.trim(),
+                '',
+                'Message:',
+                form.message.value.trim()
+            ].join('\r\n'));
+
+            const mailto = 'mailto:info@fluxmigrate.com?subject=' + subject + '&body=' + body;
+            window.location.href = mailto;
+
+            return false;
         }
     </script>
 </body>
