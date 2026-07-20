@@ -22,6 +22,4 @@ jobs:
         server-dir: public_html/
         port: 21
         protocol: ftp
-        # --- Add these options to prevent ECONNRESET ---
-        passive: true
         state-name: .ftp-deploy-sync-state.json
