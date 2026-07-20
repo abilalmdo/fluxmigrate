@@ -12,13 +12,16 @@ jobs:
     steps:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4.2.2
-    
+
     - name: 🚀 Sync files to Ultahost FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: ./fluxmigrate/
+        server-dir: public_html/
         port: 21
         protocol: ftp
+        # --- Add these options to prevent ECONNRESET ---
+        passive: true
+        state-name: .ftp-deploy-sync-state.json
