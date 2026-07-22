@@ -22,4 +22,4 @@ jobs:
         server-dir: public_html/
         port: 21
         protocol: ftp
-        state-name: .ftp-deploy-sync-state.json
+        state-name: .ftp-deploy-sync-state.json 
