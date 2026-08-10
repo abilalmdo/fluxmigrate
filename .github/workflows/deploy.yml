@@ -1,4 +1,4 @@
-name: Deploy to Ultahost
+name: Deploy to NameCheap
 
 on:
   push:
