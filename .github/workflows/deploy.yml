@@ -1,8 +1,8 @@
-name: Deploy to FTP
+name: Deploy to  
 
 on:
   push:
-    branches: [ main_ ]
+    branches: [ main ]
 
 jobs:
   web-deploy:
