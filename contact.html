@@ -338,7 +338,11 @@ footer{border-top:1px solid var(--border);padding:56px 0 32px;background:var(--b
 
 <section class="tight">
   <div class="wrap" style="max-width:760px;">
-    <form onsubmit="event.preventDefault(); alert('This form is a static template — connect it to your form backend or CRM.');">
+    <form action="https://formsubmit.co/info@fluxmigrate.com" method="POST">
+      <input type="hidden" name="_subject" value="New inquiry from fluxmigrate.com">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://www.fluxmigrate.com/contact.html?sent=1">
       <div class="formrow">
         <div>
           <label for="name">Name</label>
@@ -404,8 +408,18 @@ footer{border-top:1px solid var(--border);padding:56px 0 32px;background:var(--b
         <button type="submit" class="btn btn-primary" style="width:100%;">Submit</button>
       </div>
     </form>
+    <div id="sent-banner" style="display:none;margin-top:20px;padding:18px 22px;border-radius:var(--radius);background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.35);color:var(--teal);font-weight:600;">
+      Thanks — your message has been sent. We'll follow up shortly.
+    </div>
   </div>
 </section>
+
+<script>
+if (new URLSearchParams(window.location.search).get('sent') === '1') {
+  document.getElementById('sent-banner').style.display = 'block';
+  document.getElementById('sent-banner').scrollIntoView({behavior:'smooth', block:'center'});
+}
+</script>
 
 
 <footer>
