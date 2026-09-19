@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="fmB-t fmB-d">
+  <title id="fmB-t">FluxMigrate</title>
+  <desc id="fmB-d">A source node connected by a rising arc and arrowhead to a target node, representing a migration path.</desc>
+  <defs>
+    <linearGradient id="fmB" gradientUnits="userSpaceOnUse" x1="8" y1="56" x2="56" y2="8">
+      <stop offset="0" stop-color="#2D8FF5"/>
+      <stop offset="1" stop-color="#7C5CFC"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="38" width="18" height="18" rx="6" fill="none" stroke="#3E9BF0" stroke-width="4.5" opacity="0.75"/>
+  <path d="M28 47c10 0 17-6 17-16" fill="none" stroke="url(#fmB)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M45 26 39.5 36h11z" fill="url(#fmB)"/>
+  <rect x="36" y="6" width="18" height="18" rx="6" fill="url(#fmB)"/>
+</svg>

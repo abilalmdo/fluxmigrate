@@ -1,0 +1,7 @@
+.git
+.github
+tools
+node_modules
+*.md
+assets/brand/preview
+docker-compose.yml

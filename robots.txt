@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /tools/
+Disallow: /assets/brand/preview/
+
+Sitemap: https://www.fluxmigrate.com/sitemap.xml

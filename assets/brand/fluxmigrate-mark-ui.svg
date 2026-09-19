@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="9 11 47 42" width="47" height="42" role="img" aria-labelledby="t d">
+  <title id="t">FluxMigrate</title>
+  <desc id="d">Four slanted bars stepping to the right, the leading one detached, forming an implied letter F.</desc>
+  <defs>
+    <linearGradient id="fmUI" gradientUnits="userSpaceOnUse" x1="10" y1="52" x2="55" y2="12">
+      <stop offset="0" stop-color="#2D8FF5"/><stop offset="1" stop-color="#7C5CFC"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#fmUI)">
+    <path d="M17 12h24l-7 10H10z"/><path d="M45 12h10l-7 10H38z"/>
+    <path d="M17 27h20l-7 10H10z"/><path d="M17 42h11l-7 10H10z"/>
+  </g>
+</svg>

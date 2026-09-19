@@ -1,0 +1,8 @@
+services:
+  web:
+    build: .
+    image: fluxmigrate:local
+    container_name: fluxmigrate
+    ports:
+      - "8088:80"
+    restart: unless-stopped
