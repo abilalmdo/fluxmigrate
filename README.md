@@ -24,7 +24,8 @@ pnpm build          # → dist/   (static files, ready to upload)
 node tools/verify-dist.mjs   # SEO tags, JSON-LD, alt text, links/anchors, no third-party loads
 ```
 
-Node 22.12+ and pnpm (pinned via `packageManager`). `pnpm build` downloads the two Google fonts
+Node 22.19+ (`.nvmrc` says `22`, which CI resolves to the latest 22.x) and pnpm (pinned via `packageManager`;
+pnpm 11.9 itself refuses to run below Node 22.13). `pnpm build` downloads the two Google fonts
 once and bakes them into `dist/` — nothing is fetched from Google or any CDN at runtime.
 
 ### Preview as a real web server (Docker)
