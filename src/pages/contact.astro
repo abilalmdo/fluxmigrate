@@ -1,0 +1,104 @@
+---
+import config from "@/config/config.json";
+import PageHero from "@/components/PageHero.astro";
+import { contactPage as c } from "@/data/content";
+import Base from "@/layouts/Base.astro";
+import { breadcrumbSchema, canonicalFor, pageSchema } from "@/lib/site";
+
+const canonical = canonicalFor("/contact");
+const { contact_form_action, contact_form_next, footer_email } = config.params;
+---
+
+<Base
+  title={c.title}
+  description={c.description}
+  schema={[breadcrumbSchema("Contact", canonical), pageSchema("ContactPage", "Contact", canonical, c.description)]}
+>
+  <PageHero h1={c.h1} subtitle={c.subtitle} image={{ src: c.heroImage, alt: c.heroAlt }} />
+
+  <section class="section pt-0">
+    <div class="container">
+      <div class="row g-7 max-lg:gap-5">
+        <div class="col-12 lg:col-4">
+          <div class="card-tile lg:sticky lg:top-32">
+            <h2 class="text-h5-sm font-bold">Prefer email?</h2>
+            <p class="mt-3 text-text-dark">Write to us directly and tell us about your environment.</p>
+            <a class="link mt-6 inline-block" href={`mailto:${footer_email}`}>{footer_email}</a>
+          </div>
+        </div>
+
+        <div class="col-12 lg:col-8">
+          <div class="p-8 md:p-10 bg-white/5 rounded-3xl corner-squircle">
+            <form action={contact_form_action} method="POST" class="grid gap-5">
+              <input type="hidden" name="_subject" value="New inquiry from fluxmigrate.com" />
+              <input type="hidden" name="_template" value="table" />
+              <input type="hidden" name="_captcha" value="true" />
+              <input type="hidden" name="_next" value={contact_form_next} />
+              <div class="hp-field" aria-hidden="true">
+                <label for="_honey">Leave this field empty</label>
+                <input id="_honey" name="_honey" type="text" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <div class="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label class="field-label" for="name">Name</label>
+                  <input class="form-field" id="name" name="name" type="text" autocomplete="name" required />
+                </div>
+                <div>
+                  <label class="field-label" for="company">Company</label>
+                  <input class="form-field" id="company" name="company" type="text" autocomplete="organization" required />
+                </div>
+                <div>
+                  <label class="field-label" for="email">Business Email</label>
+                  <input class="form-field" id="email" name="email" type="email" autocomplete="email" required />
+                </div>
+                <div>
+                  <label class="field-label" for="role">Role</label>
+                  <input class="form-field" id="role" name="role" type="text" autocomplete="organization-title" />
+                </div>
+              </div>
+
+              <div>
+                <label class="field-label" for="need">What do you need?</label>
+                <select class="form-field" id="need" name="need">
+                  {c.needs.map((n) => <option>{n}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label class="field-label" for="env">Technology Environment</label>
+                <input class="form-field" id="env" name="env" type="text" placeholder="e.g. AWS, Kubernetes, VMware..." />
+              </div>
+
+              <div class="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label class="field-label" for="count">Number of Engineers Required</label>
+                  <select class="form-field" id="count" name="count">
+                    {c.engineers.map((n) => <option>{n}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="engagement">Engagement Type</label>
+                  <select class="form-field" id="engagement" name="engagement">
+                    {c.engagements.map((n) => <option>{n}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="field-label" for="details">Tell us about your requirements</label>
+                <textarea class="form-field" id="details" name="details" rows="5"></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-full py-4 text-lg font-medium">Submit</button>
+            </form>
+
+            <div id="sent-banner" class="form-notice mt-6" role="status" hidden>
+              Thanks — your message has been sent. We'll follow up shortly.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

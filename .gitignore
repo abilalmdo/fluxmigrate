@@ -1,0 +1,19 @@
+# build output
+dist/
+.astro/
+.vercel/
+
+# dependencies
+node_modules/
+tools/node_modules/
+tools/inter/
+
+# logs and env
+*.log
+.env
+.env.*
+.DS_Store
+.idea/
+.vscode/
+.claude
+tools/images/_out/

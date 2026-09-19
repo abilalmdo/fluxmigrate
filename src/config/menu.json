@@ -1,0 +1,57 @@
+{
+  "main": [
+    {
+      "name": "Services",
+      "url": "#",
+      "hasChildren": true,
+      "children": [
+        { "name": "DevSecOps", "url": "/#service-devsecops" },
+        { "name": "Cloud & Migration", "url": "/cloud-migration.html" },
+        { "name": "DevOps & Platform", "url": "/devops-platform-engineering.html" },
+        { "name": "SRE & Reliability", "url": "/sre-reliability-engineering.html" },
+        { "name": "Staff Augmentation", "url": "/staff-augmentation.html" },
+        { "name": "Kubernetes Services", "url": "/#service-kubernetes" },
+        { "name": "FinOps Consulting", "url": "/#service-finops" },
+        { "name": "Well-Architected Review", "url": "/#service-well-architected" },
+        { "name": "VMware Modernization", "url": "/vmware-modernization.html" }
+      ]
+    },
+    { "name": "Staff Augmentation", "url": "/staff-augmentation.html" },
+    { "name": "DevOps", "url": "/devops-platform-engineering.html" },
+    { "name": "SRE", "url": "/sre-reliability-engineering.html" },
+    { "name": "VMware", "url": "/vmware-modernization.html" },
+    { "name": "Technology", "url": "/technology.html" },
+    { "name": "Industries", "url": "/industries.html" },
+    { "name": "About", "url": "/about.html" }
+  ],
+  "footer_col_1_title": "Services",
+  "footer_col_2_title": "Company",
+  "footer_col_3_title": "Get started",
+  "footer_col_4_title": "Legal",
+  "footer_services": [
+    { "name": "DevSecOps", "url": "/#service-devsecops" },
+    { "name": "Cloud & Migration", "url": "/cloud-migration.html" },
+    { "name": "DevOps & Platform", "url": "/devops-platform-engineering.html" },
+    { "name": "SRE & Reliability", "url": "/sre-reliability-engineering.html" },
+    { "name": "Staff Augmentation", "url": "/staff-augmentation.html" },
+    { "name": "Kubernetes Services", "url": "/#service-kubernetes" },
+    { "name": "FinOps Consulting", "url": "/#service-finops" },
+    { "name": "Well-Architected Review", "url": "/#service-well-architected" },
+    { "name": "VMware Modernization", "url": "/vmware-modernization.html" }
+  ],
+  "footer_company": [
+    { "name": "Staff Augmentation", "url": "/staff-augmentation.html" },
+    { "name": "Technology", "url": "/technology.html" },
+    { "name": "Industries", "url": "/industries.html" },
+    { "name": "About", "url": "/about.html" }
+  ],
+  "footer_start": [
+    { "name": "Plan a Project", "url": "/contact.html" },
+    { "name": "Request Engineers", "url": "/contact.html" },
+    { "name": "Book a Discovery Call", "url": "/contact.html" }
+  ],
+  "footer_legal": [
+    { "name": "Privacy Policy", "url": "#" },
+    { "name": "Terms of Service", "url": "#" }
+  ]
+}

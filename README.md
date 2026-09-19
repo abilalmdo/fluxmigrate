@@ -1,15 +1,46 @@
 # FluxMigrate — fluxmigrate.com
 
-Marketing website for FluxMigrate: cloud infrastructure, DevOps, platform engineering and
-SRE services, delivered either as projects or as embedded engineering capacity.
+Marketing website for FluxMigrate: cloud infrastructure, DevOps, platform engineering and SRE
+services, delivered either as projects or as embedded engineering capacity.
 
 - **Live site:** https://www.fluxmigrate.com
 - **Repository:** https://github.com/abilalmdo/fluxmigrate
-- **Stack:** hand-written static HTML, one shared stylesheet, two small inline scripts. No framework.
-- **Hosting/deploy:** FTP upload to shared hosting, driven by GitHub Actions on every push to `main`.
+- **Stack:** [Astro](https://astro.build) 7 (static output) + Tailwind CSS 4, on the **Automark** theme
+  by Themefisher (MIT). No server code: the build produces plain files.
+- **Hosting/deploy:** FTP to shared hosting, driven by GitHub Actions on every push to `main`
+  (build → verify → sync `dist/`).
 
 Open work is tracked in [`../TASKS.md`](../TASKS.md). This file explains how the site is put
 together; it does not duplicate the task list.
+
+---
+
+## Quick start
+
+```bash
+pnpm install
+pnpm dev            # http://localhost:4321 — hot reload
+pnpm build          # → dist/   (static files, ready to upload)
+node tools/verify-dist.mjs   # SEO tags, JSON-LD, alt text, links/anchors, no third-party loads
+```
+
+Node 22.12+ and pnpm (pinned via `packageManager`). `pnpm build` downloads the two Google fonts
+once and bakes them into `dist/` — nothing is fetched from Google or any CDN at runtime.
+
+### Preview as a real web server (Docker)
+
+```bash
+docker compose up -d --build     # multi-stage: builds the site, serves dist/ with nginx
+# http://localhost:8088
+```
+
+On Windows the daemon lives in WSL: `wsl -e bash -lc "cd /mnt/d/FluxMigrate/fluxmigrate && docker compose up -d --build"`.
+WSL2 shuts itself down after ~60–90 s with no shell attached, which stops the container; keep a
+session open (or a hidden `wsl.exe -e sleep infinity`) while reviewing.
+
+`nginx.conf` mirrors the production `.htaccess`: gzip, fingerprinted `/_astro/*` cached for a
+year, images for a month, HTML revalidated, the custom 404, security headers, and
+`try_files $uri $uri.html` so extensionless URLs resolve.
 
 ---
 
@@ -17,181 +48,156 @@ together; it does not duplicate the task list.
 
 ```
 fluxmigrate/
-├── .github/workflows/deploy.yml   FTP deploy on push to main
-├── assets/
-│   ├── site.css                   the entire design system, shared by every page
-│   ├── favicon.svg, favicon*.png, favicon.ico, apple-touch-icon.png
-│   ├── logo.png, logo-icon.png, logo-lockup.png, og-image.png
-│   └── brand/                     vector brand system
-│       ├── *.svg                  marks, lockups, favicon, app tile, Open Graph card
-│       ├── png/                   generated PNG/ICO exports
-│       ├── preview/               contact sheets and page screenshots for review
-│       └── BRAND-GUIDELINES.md
-├── tools/                         generators — see "Regenerating things"
-├── index.html                     home
-├── cloud-migration.html           service page
-├── devops-platform-engineering.html
-├── sre-reliability-engineering.html
-├── vmware-modernization.html
-├── staff-augmentation.html
-├── technology.html
-├── industries.html                tabbed industry content
-├── about.html
-├── contact.html                   form posts to formsubmit.co
-├── 404.html
-├── robots.txt, sitemap.xml, site.webmanifest
-├── Dockerfile, nginx.conf, docker-compose.yml, .dockerignore
-└── README.md
+├── src/
+│   ├── data/content.ts          ALL page copy (home + 8 content pages + contact + 404)
+│   ├── config/
+│   │   ├── config.json          site title, URL, logo, contact form target, footer text, CTA button
+│   │   ├── menu.json            header nav (flat row + Services dropdown) and footer columns
+│   │   └── theme.json           colours and fonts → generates src/styles/generated-theme.css
+│   ├── pages/                   index, [slug] (the 8 content pages), contact, 404
+│   ├── layouts/
+│   │   ├── Base.astro           <head>, SEO, JSON-LD slots, skip link, scripts
+│   │   ├── partials/            Header (accessible menu + dropdown), Footer
+│   │   └── components/          PageHero, HeroImage, HeroDecor, Blocks, Tabs, CtaBand, PathCards, …
+│   ├── lib/site.ts              canonical URLs and schema.org builders
+│   ├── scripts/                 main.js (menu, tabs, form banner), animations.js, particleCanvas.js
+│   └── styles/                  Tailwind entry + theme CSS + FluxMigrate components
+├── public/
+│   ├── images/{icons,heroes}/   generated illustrations (see "Images")
+│   ├── images/og-image.png      social card
+│   ├── brand/                   the three logo SVGs the site loads
+│   ├── favicon*, apple-touch-icon.png, site.webmanifest, robots.txt, .htaccess
+├── tools/
+│   ├── images/                  original icon + illustration generator (SVG → WebP/PNG)
+│   ├── brand/                   logo SVG generator + exports (Python + Node)
+│   └── verify-dist.mjs          post-build verifier, also run in CI
+├── docs/brand/                  brand guidelines, logo sources/exports, review screenshots
+├── Dockerfile, nginx.conf, docker-compose.yml
+├── .github/workflows/deploy.yml
+├── LICENSE-THEME-AUTOMARK, THIRD-PARTY-NOTICES.md
+└── astro.config.mjs, package.json, tsconfig.json
 ```
 
-Eleven pages. Every page links `assets/site.css`; none carries an inlined `<style>` block.
-The nav and footer markup is still repeated per page — see FM-404 in the task register.
+### URLs are preserved
+
+The site was static HTML with `.html` URLs, and search engines have indexed them. Astro is
+configured with `build.format: "file"`, so every page keeps its address:
+
+`/`, `/about.html`, `/contact.html`, `/technology.html`, `/industries.html`,
+`/cloud-migration.html`, `/devops-platform-engineering.html`,
+`/sre-reliability-engineering.html`, `/vmware-modernization.html`, `/staff-augmentation.html`,
+`/404.html`. Canonicals, `og:url`, the sitemap and every internal link use that `.html` form.
 
 ---
 
-## Local development
+## Editing content
 
-Quickest loop — serve the folder:
+| To change… | Edit |
+| --- | --- |
+| Copy on any page, service cards, tabs, CTAs, meta title/description | `src/data/content.ts` |
+| Header nav, Services dropdown, footer columns | `src/config/menu.json` |
+| Site title, URL, footer tagline, email, contact-form target | `src/config/config.json` |
+| Colours, fonts | `src/config/theme.json` (then `pnpm dev`/`build` regenerates the CSS) |
+| Page structure or a component | `src/pages/*` and `src/layouts/*` |
+
+`**bold**` inside a title renders in the theme's accent colour. Icon names refer to files in
+`public/images/icons/`. A content page is a list of *blocks* (`cards`, `groups`, `steps`,
+`chips`, `tabs`); add one to a page's `blocks` array and `Blocks.astro` renders it.
+
+### Services taxonomy
+
+Nav has two layers and neither replaces the other:
+
+- **Flat row** (`menu.json` → `main`): Staff Augmentation, DevOps, SRE, VMware, Technology,
+  Industries, About — as on the original site.
+- **Services dropdown** (`menu.json` → `main[0].children`, mirrored in the footer): FluxMigrate's
+  five service pages under their own names, plus four categories with no page of their own yet
+  (DevSecOps, Kubernetes Services, FinOps Consulting, Well-Architected Review) that anchor into
+  the nine-card Services section on the home page (`/#service-…`).
+
+If you rename an existing service, match its own page's `<h1>`, not another company's wording
+for a similar thing.
+
+---
+
+## Images
+
+Everything in `public/images/` is original artwork generated by code — the Automark theme's own
+images are licensed for demonstration only and are **not** shipped.
 
 ```bash
-python -m http.server 8000
-# http://localhost:8000/index.html
+pnpm images                       # icons + 10 hero illustrations + OG card
+node tools/images/build.mjs icons
+node tools/images/build.mjs heroes sre-reliability    # one scene
 ```
 
-That serves files, but not the way production does. To check caching, gzip, the custom 404
-and extensionless URLs, run the container instead.
+- **Icons** (`tools/images/glyphs.mjs`, `icons.mjs`): 57 two-tone line icons on a violet tile,
+  as SVG. A glyph is drawn once on a 24-unit grid; keys map to glyphs in `icons.mjs`.
+- **Illustrations** (`tools/images/scenes/*.mjs`): ten 1600×900 scenes rendered to 2400 px WebP —
+  a control-plane overview for the home page and one per content page. They are deliberately
+  *illustrative*: no client names, logos, or numeric metrics, and each carries an
+  "Illustrative view" caption. Vendor names appear as text only.
+- **OG image** (`scenes/og.mjs`): 1200×630 PNG, built from the brand lockup and the overview scene.
+- Text inside images is set in Inter (`tools/images/fonts/`, SIL OFL) through resvg, so no font
+  needs installing on the machine that builds them.
 
-### Running it in Docker
+Generated files are committed; CI does not need to run the generator.
 
-```bash
-docker compose up -d --build      # or: docker build -t fluxmigrate:local .
-# http://localhost:8088
-docker compose down
-```
+### Brand assets
 
-On Windows the daemon lives in WSL, so drive it from there:
-
-```bash
-wsl -e bash -lc "cd /mnt/d/FluxMigrate/fluxmigrate && docker compose up -d --build"
-```
-
-`nginx.conf` serves the site with gzip, cache headers (30 days for images, 7 for CSS/JS,
-revalidate for HTML), `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` and
-`Permissions-Policy`, the custom 404, and `try_files $uri $uri.html` so `/cloud-migration`
-and `/cloud-migration.html` both resolve. `tools/` and `assets/brand/preview/` return 404.
-The image excludes them entirely.
-
-Production is FTP to shared hosting, not this container, so the two only agree if the host
-is configured to match — see FM-305 in the task register.
-
-Edit HTML directly for content. **For anything structural — nav, head, JSON-LD, landmarks —
-edit `tools/patch_pages.py` and re-run it** rather than editing eleven files by hand. The
-script is idempotent.
-
-## Deployment
-
-`.github/workflows/deploy.yml` runs `SamKirkland/FTP-Deploy-Action` on push to `main` and on
-manual dispatch. Secrets: `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`. The workflow excludes
-`.git*`, `.github`, `tools`, `node_modules`, the brand preview folder and all Markdown, so
-only the site itself is uploaded.
+`tools/brand/genbrand.py` (needs `pip install fonttools`) writes every logo SVG to
+`docs/brand/svg/` and copies the three the site uses to `public/brand/`;
+`node tools/brand/export.mjs` writes PNG exports to `docs/brand/png/` and refreshes the favicons in
+`public/`. Rules and rejected concepts: [`docs/brand/BRAND-GUIDELINES.md`](docs/brand/BRAND-GUIDELINES.md).
+`favicon.ico` (multi-size) is built once with Pillow from `docs/brand/png/favicon-512.png`.
 
 ---
 
 ## Design system
 
-The visual language is a dark engineering console: near-black ground, an aurora field and a
-faint 64 px grid behind the content, hairline borders instead of shadows, one azure-to-violet
-gradient used sparingly, and monospace eyebrow labels that give the pages a technical register.
+The look is the Automark theme: near-black `#03010E` ground, violet `#937AFF` / `#4D36D0`
+accent, Urbanist headings and Inter Tight body, pill buttons, glowing hero with drifting
+particles, a floating rounded nav bar, and a hero image that tilts flat as it scrolls into view.
 
-Everything lives in `assets/site.css`, organised in sixteen numbered sections. All values come
-from custom properties on `:root`; no colour, space or radius is hard-coded further down.
+Adaptations for FluxMigrate — kept deliberately, do not revert them:
 
-### Colour
+- **Accessible navigation.** The theme's checkbox-hack menu could not be opened by keyboard.
+  Mobile is a real `<button aria-expanded>`; the Services dropdown is a `<details>` (click,
+  Enter/Space, Escape to close, click-outside to close). The header collapses below 1280 px
+  because eight links do not fit a pill nav at 1024 px.
+- **Reduced motion respected.** The theme's Lenis smooth-scroll (which hijacked scrolling and
+  ignored `prefers-reduced-motion`) is removed. The hero tilt, header hide-on-scroll and
+  particles are skipped when the visitor asks for reduced motion.
+- **Particles fixed.** The theme created a 2000×2000 canvas per instance and repainted it every
+  frame forever (and passed its size argument in the wrong position). Now: ≤800 px, animated only
+  while on screen and the tab is visible, one still frame under reduced motion.
+- **GSAP is bundled**, not loaded from a CDN.
+- **Removed from the theme:** blog, pricing, careers, case studies, integrations, testimonials,
+  partner logos, Stripe and API routes, the Vercel adapter, React/MDX. A B2B consultancy with no
+  published clients should not display invented ones (task FM-701).
 
-| Token | Value | Role |
-| --- | --- | --- |
-| `--ink` | `#05080F` | page ground |
-| `--surface` / `--surface-2` / `--surface-3` | `#0C1220` / `#101830` / `#16203C` | panels, fields, hover |
-| `--line` / `--line-2` / `--line-3` | `rgba(140,162,204,.12 / .22 / .34)` | hairlines at three weights |
-| `--text` / `--text-2` / `--text-3` | `#E9EEF9` / `#9AA7C4` / `#66728F` | heading, body, label |
-| `--azure` / `--azure-200` | `#2D8FF5` / `#6FB4FF` | primary accent, links |
-| `--violet` / `--violet-200` | `#7C5CFC` / `#A98BFF` | gradient end, secondary |
-| `--teal` | `#2DD4BF` | positive signal, tags |
-| `--amber` | `#F5A524` | incident marker in the SRE diagram |
+### Accessibility and quality gates
 
-`--grad` is the only gradient in normal use. It appears on the logo, the primary button, the
-active nav underline, list bullets, the card hover ring and the eyebrow rule — and nowhere
-across large areas.
-
-### Typography
-
-- **Inter Tight** 500/600/700 — headings, brand wordmark, drawer links.
-- **Inter** 400/500/600 — body copy, buttons, form fields.
-- **JetBrains Mono** 500 — eyebrows, lifecycle headings, table headers, footer column titles,
-  step numbers. Uppercase, `.14–.16em` tracking.
-
-Inter Tight was chosen because the logo wordmark is set in Inter Display SemiBold; the two
-agree at a glance. Headings use `clamp()` and tight tracking (`-0.032em` to `-0.038em`).
-
-### Layout primitives
-
-`.wrap` (1200 px, fluid gutter) · `section` / `section.tight` · `.section-head` · `.kicker` ·
-`.grid.cols-2/3/4` · `.card` · `.lifecycle` · `.sequence` + `.seq-step` · `.tabs` +
-`.tab-panel` · `.cta-band` · `.paths` + `.path-card` · `.table-scroll` · `.notice` ·
-`.hp-field` (honeypot) · `.skip-link` · `.nav-toggle` + `.nav-drawer`.
-
-Breakpoints: 1000 px (hero stacks, grids go 2-up, header collapses into the drawer) and
-640 px (everything single column).
-
-### Signature details
-
-- The logo's slanted bar is reused as the eyebrow rule and as the list bullet, so the brand
-  mark echoes through the page without repeating the logo.
-- Card borders are a masked gradient ring that fades in on hover, which keeps the resting
-  state flat and the hover state branded.
-- Nav links and tabs share one underline animation that grows from the left.
-- Four hero diagrams — migration corridor, delivery pipeline, reliability band, engineer mesh
-  — are assigned by page subject so no two page types open the same way.
+Zero axe-core violations (WCAG 2 A/AA + best practice) on all pages at 1440 px and 390 px;
+verified after every significant change together with `tools/verify-dist.mjs`. Both should
+pass before deploying.
 
 ---
 
-## Brand assets
+## Deployment
 
-`assets/brand/` holds the vector brand system. The mark is four slanted bars stepping to the
-right, the leading one detached — an implied **F** and a picture of workloads in migration.
-Rules, clear space, minimum sizes and the rejected concepts are in
-[`assets/brand/BRAND-GUIDELINES.md`](assets/brand/BRAND-GUIDELINES.md).
+`.github/workflows/deploy.yml` runs on push to `main`: install (`pnpm --frozen-lockfile`) →
+`pnpm build` → `node tools/verify-dist.mjs` → `SamKirkland/FTP-Deploy-Action` syncing `dist/`.
+Secrets: `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`. The action tracks what it uploaded, so
+files that no longer exist (the old `assets/` folder and hand-written pages) are removed from the
+host on the first run.
 
----
+`public/.htaccess` (Apache/LiteSpeed) provides the 404 page, extensionless URLs, `/index.html`→`/`,
+caching, gzip and security headers. The http→https and non-www→www redirects are written but
+commented out until the host's TLS/CDN setup is confirmed — see FM-305.
 
-## Regenerating things
+## Licences
 
-Three generators live in `tools/`. All are idempotent and all are run from the repository root.
-
-| Script | What it rewrites |
-| --- | --- |
-| `tools/patch_pages.py` | head block, icons, fonts, canonical, JSON-LD, skip link, `<main>`, nav and drawer, footer brand, card icons — across all ten content pages |
-| `tools/hero_visuals.py` | the hero diagram on each page, picked by subject |
-| `tools/genbrand.py` + `tools/export.js` | the SVG brand sources and every PNG/ICO export |
-
-```bash
-python tools/patch_pages.py
-python tools/hero_visuals.py
-
-# brand pipeline (only when the mark itself changes)
-cd tools
-npm install                 # @resvg/resvg-js + sharp
-pip install fonttools
-# place Inter OTFs under tools/inter/extras/otf/  (github.com/rsms/inter releases)
-python genbrand.py          # writes assets/brand/*.svg
-node export.js              # writes assets/brand/png/*
-```
-
-`genbrand.py` reads glyph outlines from the Inter OTF files and emits the wordmark as real
-vector paths, so the SVG logos do not depend on a font being installed anywhere.
-
-### Screenshot check
-
-`assets/brand/preview/` holds reference screenshots. To refresh them, drive the pages with
-Puppeteer at 1440 px and at 390 px and confirm `document.documentElement.scrollWidth` never
-exceeds `clientWidth` — horizontal overflow is the failure this catches.
+Automark © Themefisher, MIT — [`LICENSE-THEME-AUTOMARK`](LICENSE-THEME-AUTOMARK). Its images are
+"demonstration purposes only" and are not used. Other components and fonts:
+[`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).

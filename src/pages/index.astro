@@ -1,0 +1,166 @@
+---
+import Badge from "@/components/Badge.astro";
+import CtaBand from "@/components/CtaBand.astro";
+import GradientBlob from "@/components/GradientBlob.astro";
+import HeroDecor from "@/components/HeroDecor.astro";
+import HeroImage from "@/components/HeroImage.astro";
+import Icon from "@/components/Icon.astro";
+import PathCards from "@/components/PathCards.astro";
+import SectionIntro from "@/components/SectionIntro.astro";
+import { home } from "@/data/content";
+import Base from "@/layouts/Base.astro";
+import { organizationSchema, websiteSchema } from "@/lib/site";
+import { markdownify } from "@/lib/utils/textConverter";
+
+const caps = home.capabilities.items;
+const half = Math.ceil(caps.length / 2);
+const rows = [caps.slice(0, half), caps.slice(half)];
+---
+
+<Base title={home.title} description={home.description} schema={[organizationSchema, websiteSchema]}>
+  <!-- Banner -->
+  <section class="section-ph relative overflow-hidden">
+    <HeroDecor id="home" />
+    <div class="container relative">
+      <div class="row justify-center">
+        <div class="mb-16 lg:mb-20 text-center relative">
+          <div class="flex justify-center mb-6"><Badge title={home.badge} /></div>
+          <h1 class="mb-8 lg:col-9 mx-auto text-h3 lg:text-h1 hasHighlight" set:html={markdownify(home.h1)} />
+          <p class="mb-5 lg:col-7 mx-auto text-lg lg:text-xl">{home.lede}</p>
+          <p class="mb-10 lg:col-6 mx-auto">{home.body}</p>
+          <div class="flex gap-4 justify-center items-center flex-wrap">
+            <a class="btn btn-primary" href={home.primary.href}>{home.primary.label}</a>
+            <a class="btn btn-outline" href={home.secondary.href}>{home.secondary.label}</a>
+          </div>
+        </div>
+        <div class="col-12">
+          <HeroImage src={home.heroImage} alt={home.heroAlt} width={1600} height={900} tilt />
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="h-px bg-linear-to-r from-transparent from-10% via-white/50 to-90% to-transparent border-0" />
+
+  <!-- Capabilities -->
+  <section class="section pt-24 xl:pt-30">
+    <div class="container">
+      <div class="section-container">
+        <SectionIntro title={home.capabilities.title} text={home.capabilities.text} />
+        <div class="section-content">
+          {
+            rows.map((row, r) => (
+              <div class:list={["feature-items-group", r === 0 && "mb-9"]}>
+                {row.map((text) => (
+                  <div class="bg-body border border-border px-4 w-full py-2.5 rounded-full flex items-center justify-center relative z-10 gap-x-2">
+                    <svg class="shrink-0" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                      <circle cx="10" cy="10" r="9" stroke="var(--color-primary)" stroke-width="1.5" />
+                      <path d="m6 10.2 2.8 2.8L14 7.6" stroke="var(--color-primary)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="font-semibold text-white text-lg">{text}</span>
+                  </div>
+                ))}
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lifecycle -->
+  <section class="section relative overflow-hidden">
+    <div class="container">
+      <div class="section-container">
+        <SectionIntro title={home.lifecycle.title} />
+        <div class="section-content">
+          <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            {
+              home.lifecycle.items.map((item, i) => (
+                <article class="card-tile">
+                  <Icon name={item.icon} size={56} class="mb-6" />
+                  <p class="text-sm tracking-wider uppercase text-primary font-semibold mb-1" aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
+                  </p>
+                  <h3 class="text-h5-sm font-bold">{item.title}</h3>
+                  <ul class="stars-list mt-5 text-text-dark">
+                    {item.list.map((li) => (
+                      <li>{li}</li>
+                    ))}
+                  </ul>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    <GradientBlob />
+  </section>
+
+  <!-- Services -->
+  <section class="section relative overflow-hidden" id="services">
+    <div class="container">
+      <div class="section-container">
+        <SectionIntro title={home.services.title} text={home.services.text} badge={home.services.badge} />
+        <div class="section-content">
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {
+              home.services.items.map((s) => (
+                <article id={s.id} class="card-tile scroll-mt-32 flex flex-col">
+                  <Icon name={s.icon} size={56} class="mb-6" />
+                  <h3 class="text-h5-sm font-bold">{s.title}</h3>
+                  <p class="mt-3 text-text-dark grow">{s.text}</p>
+                  <a
+                    href={s.href}
+                    class="mt-6 inline-flex items-center gap-2 font-semibold text-white hover:text-primary transition-colors"
+                  >
+                    {s.label}
+                    <span class="sr-only">: {s.title}</span>
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                      <path d="M4 10h11m0 0-4-4m4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </a>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    <GradientBlob />
+  </section>
+
+  <!-- Operational evidence -->
+  <section class="section-box max-lg:overflow-hidden relative isolate overflow-hidden">
+    <div class="container">
+      <div class="section-container">
+        <SectionIntro title={home.evidence.title} text={home.evidence.text} badge={home.evidence.badge} />
+        <div class="section-content">
+          <div class="grid lg:grid-cols-3 gap-8 xl:gap-12">
+            {
+              home.evidence.items.map((item) => (
+                <article class="p-8 xl:px-10 xl:py-11 rounded-2xl border border-border flex flex-col items-center text-center">
+                  <Icon name={item.icon} size={64} class="mb-6" />
+                  <h3 class="text-h5-sm font-bold font-secondary">{item.title}</h3>
+                  <div class="w-px h-11 my-4 bg-text-dark/30"></div>
+                  <p>{item.text}</p>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    <div aria-hidden="true" class="absolute inset-0 grid place-items-center size-full -z-10">
+      <div class="size-225 bg-radial from-primary-light/30 to-transparent from-0% to-70% rounded-full"></div>
+    </div>
+  </section>
+
+  <PathCards />
+  <CtaBand
+    title={home.cta.title}
+    text={home.cta.text}
+    button={home.cta.button}
+    badge={home.cta.badge}
+  />
+</Base>

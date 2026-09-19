@@ -1,0 +1,46 @@
+---
+import Icon from "./Icon.astro";
+
+interface Props {
+  tabs: { id: string; label: string; icon: string; items: string[] }[];
+}
+const { tabs } = Astro.props;
+---
+
+<!-- WAI-ARIA tabs: roving tabindex, arrow/Home/End keys (see src/scripts/main.js) -->
+<div data-tabs>
+  <div role="tablist" aria-label="Industries" class="flex flex-wrap justify-center gap-2 mb-10">
+    {
+      tabs.map((t, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`tab-${t.id}`}
+          aria-controls={`panel-${t.id}`}
+          aria-selected={i === 0 ? "true" : "false"}
+          tabindex={i === 0 ? 0 : -1}
+          class:list={["tab-pill", i === 0 && "is-active"]}
+        >
+          {t.label}
+        </button>
+      ))
+    }
+  </div>
+  {
+    tabs.map((t, i) => (
+      <div role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={i !== 0} tabindex="0">
+        <div class="flex flex-col lg:flex-row gap-8 items-start rounded-3xl corner-squircle bg-white/5 border border-border p-8 lg:p-10">
+          <div class="shrink-0">
+            <Icon name={t.icon} size={72} />
+            <h3 class="text-h5-sm font-bold mt-5">{t.label}</h3>
+          </div>
+          <ul class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 w-full">
+            {t.items.map((item) => (
+              <li class="bg-body border border-border rounded-2xl px-5 py-4 text-white font-semibold">{item}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    ))
+  }
+</div>

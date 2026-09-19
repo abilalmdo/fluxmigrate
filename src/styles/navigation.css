@@ -1,0 +1,67 @@
+.header {
+  @apply bg-transparent py-6 left-0 w-full z-50 transition-transform duration-700;
+  transform: translateY(0px);
+}
+
+.header.hide {
+  transform: translateY(-200px);
+}
+
+/* navbar items */
+.navbar {
+  @apply relative flex flex-wrap items-center justify-between;
+}
+
+.navbar-brand {
+  @apply text-text-dark text-xl font-semibold;
+}
+
+.navbar-nav {
+  @apply text-center xl:text-left;
+}
+
+.nav-link {
+  @apply text-white hover:text-primary block p-3 cursor-pointer font-normal transition xl:px-2 xl:py-3;
+}
+.nav-link.active {
+  @apply text-primary;
+}
+
+/* Services dropdown — a <details>, so it opens with click, Enter or Space */
+.nav-details > summary {
+  list-style: none;
+}
+.nav-details > summary::-webkit-details-marker {
+  display: none;
+}
+.nav-details .chevron {
+  transition: transform 0.2s ease;
+}
+.nav-details[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-list {
+  @apply p-2;
+}
+@media (min-width: 1280px) {
+  .nav-dropdown-list {
+    @apply absolute left-1/2 top-full mt-4 w-72 -translate-x-1/2 rounded-2xl border border-border bg-light/95 p-3 text-left shadow-2xl backdrop-blur-xl;
+  }
+}
+@media (max-width: 1279px) {
+  .nav-dropdown-list {
+    @apply mb-2 ml-3 border-l border-border pl-3 text-left;
+  }
+}
+
+.nav-dropdown-item {
+  @apply not-last:mb-0.5;
+}
+
+.nav-dropdown-link {
+  @apply rounded-lg px-3 py-2 font-normal text-text hover:bg-white/5 hover:text-white transition;
+}
+.nav-dropdown-link.active {
+  @apply text-primary;
+}

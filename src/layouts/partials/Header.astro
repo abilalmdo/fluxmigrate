@@ -1,0 +1,114 @@
+---
+import Logo from "@/components/Logo.astro";
+import config from "@/config/config.json";
+import menu from "@/config/menu.json";
+
+interface NavLink {
+  name: string;
+  url: string;
+  hasChildren?: boolean;
+  children?: { name: string; url: string }[];
+}
+
+const main = menu.main as NavLink[];
+const { navigation_button, settings } = config;
+
+// page path without extension, so "/about.html" and "/about" both match
+const here = Astro.url.pathname.replace(/\.html$/, "").replace(/\/$/, "") || "/";
+const norm = (u: string) => u.replace(/\.html$/, "").replace(/\/$/, "") || "/";
+const isCurrent = (url: string) => url !== "#" && !url.includes("#") && norm(url) === here;
+// a dropdown lights up when the visitor is on a page that only exists inside it
+const inFlatRow = new Set(main.filter((m) => !m.hasChildren).map((m) => norm(m.url)));
+const childActive = (item: NavLink) =>
+  !!item.children?.some((c) => isCurrent(c.url) && !inFlatRow.has(norm(c.url)));
+---
+
+<header class:list={["header z-50 w-full transition-all duration-300", settings.sticky_header && "fixed top-0"]}>
+  <nav class="navbar container relative z-30" aria-label="Primary">
+    <div class="order-0">
+      <Logo />
+    </div>
+
+    <button
+      id="nav-toggle"
+      type="button"
+      class="order-3 xl:hidden text-white bg-dark/30 backdrop-blur-lg size-12 rounded-xl flex items-center justify-center cursor-pointer"
+      aria-expanded="false"
+      aria-controls="nav-menu"
+      aria-label="Open menu"
+    >
+      <svg class="icon-open h-6 fill-current" viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M0 3h20v2H0V3z m0 6h20v2H0V9z m0 6h20v2H0v-2z"></path>
+      </svg>
+      <svg class="icon-close h-6 fill-current hidden" viewBox="0 0 20 20" aria-hidden="true">
+        <polygon
+          points="11 9 22 9 22 11 11 11 11 22 9 22 9 11 -2 11 -2 9 9 9 9 -2 11 -2"
+          transform="rotate(45 10 10)"></polygon>
+      </svg>
+    </button>
+
+    <ul
+      id="nav-menu"
+      class="navbar-nav order-3 hidden xl:flex xl:flex-row w-full py-6 max-xl:mt-5 xl:order-1 xl:w-auto xl:gap-x-4 2xl:gap-x-7 xl:py-0 bg-light/95 xl:bg-dark/30 backdrop-blur-lg rounded-2xl xl:rounded-full xl:corner-squircle px-6"
+    >
+      {
+        main.map((item) =>
+          item.hasChildren ? (
+            <li class="nav-item nav-dropdown relative">
+              <details class="nav-details">
+                <summary class:list={["nav-link inline-flex items-center gap-1", childActive(item) && "active"]}>
+                  {item.name}
+                  <svg class="h-4 w-4 fill-current chevron" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </summary>
+                <ul class="nav-dropdown-list">
+                  {item.children?.map((child) => (
+                    <li class="nav-dropdown-item">
+                      <a
+                        href={child.url}
+                        class:list={["nav-dropdown-link block", isCurrent(child.url) && "active"]}
+                        aria-current={isCurrent(child.url) ? "page" : undefined}
+                      >
+                        {child.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            </li>
+          ) : (
+            <li class="nav-item">
+              <a
+                href={item.url}
+                class:list={["nav-link block", isCurrent(item.url) && "active"]}
+                aria-current={isCurrent(item.url) ? "page" : undefined}
+              >
+                {item.name}
+              </a>
+            </li>
+          ),
+        )
+      }
+      {
+        navigation_button.enable && (
+          <li class="pt-4 inline-block xl:hidden">
+            <a class="btn btn-primary w-full text-center" href={navigation_button.link}>
+              {navigation_button.label}
+            </a>
+          </li>
+        )
+      }
+    </ul>
+
+    <div class="order-1 ml-auto flex items-center xl:ml-0 xl:order-2 max-xl:mr-3">
+      {
+        navigation_button.enable && (
+          <a class="btn btn-primary hidden md:inline-block max-xl:text-sm max-xl:px-5 max-xl:py-2.5" href={navigation_button.link}>
+            {navigation_button.label}
+          </a>
+        )
+      }
+    </div>
+  </nav>
+</header>

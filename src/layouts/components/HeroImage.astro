@@ -1,0 +1,31 @@
+---
+/**
+ * Framed hero illustration. `tilt` enables the scroll-scrubbed 3D settle
+ * (see src/scripts/animations.js) and is used on the home page only.
+ */
+interface Props {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  tilt?: boolean;
+}
+const { src, alt, width = 1600, height = 900, tilt = false } = Astro.props;
+---
+
+<div class:list={["flex justify-center w-full", tilt && "perspective-near xl:perspective-dramatic"]}>
+  <div
+    class="relative w-full max-w-6xl rounded-4xl corner-squircle border border-white/15 bg-light/50 p-2 md:p-3 shadow-[0_0_120px_-30px_var(--color-primary)]"
+    data-hero-tilt={tilt ? "" : undefined}
+  >
+    <img
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      class="w-full h-auto rounded-3xl corner-squircle"
+      fetchpriority="high"
+      decoding="async"
+    />
+  </div>
+</div>

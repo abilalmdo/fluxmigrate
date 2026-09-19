@@ -1,0 +1,35 @@
+---
+import { markdownify } from "@/lib/utils/textConverter";
+import HeroDecor from "./HeroDecor.astro";
+import HeroImage from "./HeroImage.astro";
+
+interface Props {
+  h1: string;
+  subtitle: string;
+  cta?: { label: string; href: string };
+  image?: { src: string; alt: string };
+}
+const { h1, subtitle, cta, image } = Astro.props;
+---
+
+<section class="section-ph relative overflow-hidden pb-16 lg:pb-24">
+  <HeroDecor id="ph" />
+  <div class="container relative">
+    <div class="lg:max-w-4xl mx-auto text-center">
+      <h1 class="hasHighlight mb-6 text-h3 lg:text-h1" set:html={markdownify(h1)} />
+      <p class="mb-8 text-lg lg:text-xl mx-auto max-w-3xl">{subtitle}</p>
+      {
+        cta && (
+          <a class="btn btn-primary" href={cta.href}>
+            {cta.label}
+          </a>
+        )
+      }
+    </div>
+    {image && (
+      <div class="mt-14 lg:mt-20">
+        <HeroImage src={image.src} alt={image.alt} width={1600} height={900} />
+      </div>
+    )}
+  </div>
+</section>

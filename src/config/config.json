@@ -1,0 +1,37 @@
+{
+  "site": {
+    "title": "FluxMigrate",
+    "base_url": "https://www.fluxmigrate.com",
+    "base_path": "/",
+    "trailing_slash": false,
+    "favicon": "/favicon.svg",
+    "logo": "/brand/fluxmigrate-lockup-horizontal.svg",
+    "logo_width": "198",
+    "logo_height": "34",
+    "logo_text": "FluxMigrate"
+  },
+  "settings": {
+    "sticky_header": true
+  },
+  "params": {
+    "contact_form_action": "https://formsubmit.co/info@fluxmigrate.com",
+    "contact_form_next": "https://www.fluxmigrate.com/contact.html?sent=1",
+    "copyright": "&copy; 2026 FluxMigrate. All rights reserved.",
+    "footer_tagline": "Cloud infrastructure, DevOps and reliability engineering — as projects or as an extension of your team.",
+    "footer_email": "info@fluxmigrate.com"
+  },
+  "navigation_button": {
+    "enable": true,
+    "label": "Talk to a Specialist",
+    "link": "/contact.html"
+  },
+  "google_tag_manager": {
+    "enable": false,
+    "gtm_id": ""
+  },
+  "metadata": {
+    "meta_author": "FluxMigrate",
+    "meta_image": "/images/og-image.png",
+    "meta_description": "FluxMigrate helps organizations design, migrate, automate and operate modern cloud and hybrid infrastructure, and provides Cloud, DevOps, Platform and SRE engineers to extend your team."
+  }
+}

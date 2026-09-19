@@ -1,0 +1,40 @@
+---
+import Blocks from "@/components/Blocks.astro";
+import CtaBand from "@/components/CtaBand.astro";
+import PageHero from "@/components/PageHero.astro";
+import PathCards from "@/components/PathCards.astro";
+import { pages, type PageContent } from "@/data/content";
+import Base from "@/layouts/Base.astro";
+import { breadcrumbSchema, canonicalFor, pageSchema, serviceSchema } from "@/lib/site";
+
+export function getStaticPaths() {
+  return pages.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+const { page } = Astro.props as { page: PageContent };
+const canonical = canonicalFor(`/${page.slug}`);
+
+const schema: object[] = [breadcrumbSchema(page.navLabel, canonical)];
+if (page.schema?.type === "Service") {
+  schema.push(serviceSchema(page.schema.name, canonical, page.description));
+} else if (page.schema) {
+  schema.push(pageSchema(page.schema.type, page.schema.name, canonical, page.description));
+}
+---
+
+<Base title={page.title} description={page.description} schema={schema}>
+  <PageHero
+    h1={page.h1}
+    subtitle={page.subtitle}
+    cta={page.cta}
+    image={{ src: page.heroImage, alt: page.heroAlt }}
+  />
+  <Blocks blocks={page.blocks} />
+  {
+    page.closing ? (
+      <CtaBand title={page.closing.title} text={page.closing.text} button={page.closing.cta} />
+    ) : (
+      <PathCards />
+    )
+  }
+</Base>

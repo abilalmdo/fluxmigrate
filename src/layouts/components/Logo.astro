@@ -1,0 +1,15 @@
+---
+import config from "@/config/config.json";
+const { logo, logo_width, logo_height, title } = config.site;
+---
+
+<a href="/" class="navbar-brand inline-flex items-center" aria-label={`${title} home`}>
+  <img
+    src={logo}
+    width={Number(logo_width)}
+    height={Number(logo_height)}
+    alt=""
+    decoding="async"
+    style={`height:${logo_height}px;width:auto`}
+  />
+</a>

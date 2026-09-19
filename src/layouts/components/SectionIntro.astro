@@ -1,0 +1,19 @@
+---
+import { markdownify } from "@/lib/utils/textConverter";
+import Badge from "./Badge.astro";
+
+interface Props {
+  title: string;
+  text?: string;
+  badge?: string;
+  /** heading level for the section title */
+  as?: "h2" | "h1";
+}
+const { title, text, badge, as: Tag = "h2" } = Astro.props;
+---
+
+<div class="section-intro centralize">
+  {badge && <Badge title={badge} />}
+  <Tag class="title hasHighlight" set:html={markdownify(title)} />
+  {text && <p class="subtitle">{text}</p>}
+</div>

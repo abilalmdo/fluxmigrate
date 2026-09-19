@@ -1,0 +1,57 @@
+# fluxmigrate.com — Apache/LiteSpeed rules for shared hosting (the site is plain static files in dist/).
+# The nginx.conf used by the Docker preview mirrors these.
+
+# --- error page -------------------------------------------------------------
+ErrorDocument 404 /404.html
+
+# --- clean URLs -------------------------------------------------------------
+# Every page is built as <slug>.html and every link/canonical uses that form; these rules make
+# the extensionless form resolve too, and fold /index.html into /.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  RewriteCond %{THE_REQUEST} \s/index\.html[\s?] [NC]
+  RewriteRule ^index\.html$ / [R=301,L]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^(.+)$ $1.html [L]
+
+  # One canonical origin (task FM-305). Uncomment once the host's TLS/CDN setup is confirmed,
+  # otherwise a proxy that terminates TLS can cause a redirect loop:
+  #   RewriteCond %{HTTPS} off
+  #   RewriteRule ^ https://www.fluxmigrate.com%{REQUEST_URI} [R=301,L]
+  #   RewriteCond %{HTTP_HOST} ^fluxmigrate\.com$ [NC]
+  #   RewriteRule ^ https://www.fluxmigrate.com%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# --- caching ----------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/x-icon "access plus 1 month"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+<IfModule mod_headers.c>
+  # /_astro/ files are fingerprinted, so they can be cached forever
+  <If "%{REQUEST_URI} =~ m#^/_astro/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# --- compression ------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml application/json application/manifest+json text/xml
+</IfModule>
+
+AddType application/manifest+json .webmanifest
