@@ -6,9 +6,10 @@ services, delivered either as projects or as embedded engineering capacity.
 - **Live site:** https://www.fluxmigrate.com
 - **Repository:** https://github.com/abilalmdo/fluxmigrate
 - **Stack:** [Astro](https://astro.build) 7 (static output) + Tailwind CSS 4, on the **Automark** theme
-  by Themefisher (MIT). No server code: the build produces plain files.
-- **Hosting/deploy:** FTP to shared hosting, driven by GitHub Actions on every push to `main`
-  (build → verify → sync `dist/`).
+  by Themefisher (MIT). Pages are plain files; the only server code is the contact form's
+  `contact-submit.php`.
+- **Hosting/deploy:** FTP to shared hosting (Namecheap, LiteSpeed, PHP 8.x), driven by GitHub Actions
+  on every push to `main` (build → verify → write mail config → sync `dist/` → check the form).
 
 Open work is tracked in [`../TASKS.md`](../TASKS.md). This file explains how the site is put
 together; it does not duplicate the task list.
@@ -52,25 +53,29 @@ fluxmigrate/
 ├── src/
 │   ├── data/content.ts          ALL page copy (home + 8 content pages + contact + 404)
 │   ├── config/
-│   │   ├── config.json          site title, URL, logo, contact form target, footer text, CTA button
+│   │   ├── config.json          site title, URL, logo, contact form endpoint, footer text, CTA button
 │   │   ├── menu.json            header nav (flat row + Services dropdown) and footer columns
 │   │   └── theme.json           colours and fonts → generates src/styles/generated-theme.css
-│   ├── pages/                   index, [slug] (the 8 content pages), contact, 404
+│   ├── pages/                   index, [slug] (the 8 content pages), contact, thank-you, 404
 │   ├── layouts/
 │   │   ├── Base.astro           <head>, SEO, JSON-LD slots, skip link, scripts
 │   │   ├── partials/            Header (accessible menu + dropdown), Footer
 │   │   └── components/          PageHero, HeroImage, HeroDecor, Blocks, Tabs, CtaBand, PathCards, …
 │   ├── lib/site.ts              canonical URLs and schema.org builders
-│   ├── scripts/                 main.js (menu, tabs, form banner), animations.js, particleCanvas.js
+│   ├── scripts/                 main.js (menu, tabs, contact form), animations.js, particleCanvas.js
 │   └── styles/                  Tailwind entry + theme CSS + FluxMigrate components
 ├── public/
 │   ├── images/{icons,heroes}/   generated illustrations (see "Images")
 │   ├── images/og-image.png      social card
 │   ├── brand/                   the three logo SVGs the site loads
+│   ├── contact-submit.php       the contact form back end (the only server code)
+│   ├── _form/                   PHPMailer (LGPL) for the form; web access denied
 │   ├── favicon*, apple-touch-icon.png, site.webmanifest, robots.txt, .htaccess
 ├── tools/
 │   ├── images/                  original icon + illustration generator (SVG → WebP/PNG)
 │   ├── brand/                   logo SVG generator + exports (Python + Node)
+│   ├── form-test/               contact-form tests: real PHP in Docker + a fake SMTP server
+│   ├── write-mail-config.mjs    CI step: writes dist/mail-config.php from GitHub secrets
 │   └── verify-dist.mjs          post-build verifier, also run in CI
 ├── docs/brand/                  brand guidelines, logo sources/exports, review screenshots
 ├── Dockerfile, nginx.conf, docker-compose.yml
@@ -87,7 +92,7 @@ configured with `build.format: "file"`, so every page keeps its address:
 `/`, `/about.html`, `/contact.html`, `/technology.html`, `/industries.html`,
 `/cloud-migration.html`, `/devops-platform-engineering.html`,
 `/sre-reliability-engineering.html`, `/vmware-modernization.html`, `/staff-augmentation.html`,
-`/404.html`. Canonicals, `og:url`, the sitemap and every internal link use that `.html` form.
+`/404.html`, `/thank-you.html` (noindex, not in the sitemap). Canonicals, `og:url`, the sitemap and every internal link use that `.html` form.
 
 ---
 
@@ -97,7 +102,9 @@ configured with `build.format: "file"`, so every page keeps its address:
 | --- | --- |
 | Copy on any page, service cards, tabs, CTAs, meta title/description | `src/data/content.ts` |
 | Header nav, Services dropdown, footer columns | `src/config/menu.json` |
-| Site title, URL, footer tagline, email, contact-form target | `src/config/config.json` |
+| Site title, URL, footer tagline, email, contact-form endpoint | `src/config/config.json` |
+| Thank-you page wording | `thankYouPage` in `src/data/content.ts` |
+| Who receives enquiries, SMTP host/user | GitHub secrets (see "Contact form"), not a file in the repo |
 | Colours, fonts | `src/config/theme.json` (then `pnpm dev`/`build` regenerates the CSS) |
 | Page structure or a component | `src/pages/*` and `src/layouts/*` |
 
@@ -185,11 +192,52 @@ pass before deploying.
 
 ---
 
+## Contact form
+
+The form posts to our own `public/contact-submit.php`; **no third party is involved and the visitor
+never leaves fluxmigrate.com**. FormSubmit was dropped: its captcha page and its activation step were
+the problem (FM-105, FM-106).
+
+```
+contact.html --fetch--> contact-submit.php --SMTP--> mailbox (forms@) --> info@fluxmigrate.com
+     |  (no JS: plain POST)        |
+     +<-- 303 /thank-you.html <----+      on error: message inline, typed text kept
+```
+
+- **Delivery:** PHPMailer (`public/_form/phpmailer/`, LGPL-2.1, see `THIRD-PARTY-NOTICES.md`) over
+  authenticated SMTP. If SMTP fails (some shared hosts block outbound ports) it falls back to the host's
+  own `mail()`, which SPF and DKIM already cover. `Reply-To` is the visitor, so replying answers them.
+- **Abuse controls:** honeypot (`hp_url`), a minimum fill time (the script stamps `ts`; under 2.5 s is
+  refused), a same-site `Origin` check, per-IP (5/h) and global (60/h) rate limits kept in the system
+  temp dir, length limits, and CR/LF stripped from every header value. Bots that trip the honeypot or the
+  timer are told "success" and nothing is sent. No captcha, no third-party script.
+- **Secrets:** the SMTP credentials exist only as **GitHub Actions secrets** `SMTP_HOST`, `SMTP_USER`,
+  `SMTP_PASSWORD` (optional: `SMTP_PORT` = 465, `SMTP_SECURE` = `ssl` or `tls`, `MAIL_TO` =
+  info@fluxmigrate.com, `MAIL_FROM` = `SMTP_USER`). On each deploy `tools/write-mail-config.mjs` writes
+  `dist/mail-config.php` from them; nothing is committed. `public/.htaccess` refuses that file (and
+  `error_log`, and the FTP action's sync-state file), and the deploy workflow requests the URL after every
+  deploy and fails if it is served. Set a secret under *GitHub, repo, Settings, Secrets and variables,
+  Actions*, or run `gh secret set SMTP_PASSWORD` (it prompts, so the value never lands in shell history).
+- **Rotating the password:** change the mailbox password in cPanel, update `SMTP_PASSWORD`, re-run the
+  deploy workflow.
+- **Local dev:** `pnpm dev` and the nginx preview do not run PHP, so submitting there does not work.
+  Test the back end with
+  `wsl -e bash -lc "cd /mnt/d/FluxMigrate/fluxmigrate && pnpm build && bash tools/form-test/run.sh"`
+  (real PHP 8.3 in Docker, real PHPMailer, a fake SMTP server). It cannot cover the production `.htaccess`
+  or the real mailbox: the deploy workflow checks the first, and one real enquiry checks the second.
+- **Changing fields:** add the input in `contact.astro`, plus a matching `fm_field(...)` line and a body
+  line in `contact-submit.php`. Length limits live in both places (`maxlength` and the PHP).
+
+---
+
 ## Deployment
 
 `.github/workflows/deploy.yml` runs on push to `main`: install (`pnpm --frozen-lockfile`) →
 `pnpm build` → `node tools/verify-dist.mjs` → `SamKirkland/FTP-Deploy-Action` syncing `dist/`.
-Secrets: `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`. The action tracks what it uploaded, so
+Secrets: `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`, plus `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`
+for the contact form (a missing one fails the deploy at the "Write the mail config" step). After the
+sync, a step requests `/contact-submit.php` (must answer 405, proving PHP runs) and `/mail-config.php`
+(must be refused). The action tracks what it uploaded, so
 files that no longer exist (the old `assets/` folder and hand-written pages) are removed from the
 host on the first run.
 

@@ -35,6 +35,16 @@ jobs:
       - name: Verify the build
         run: node tools/verify-dist.mjs
 
+      # The contact form (public/contact-submit.php) needs SMTP credentials. They live only in GitHub
+      # Actions secrets and are written into dist/ here, after verification, never into the repository.
+      # Repository secrets: SMTP_HOST, SMTP_USER, SMTP_PASSWORD (optional: SMTP_PORT, SMTP_SECURE, MAIL_TO).
+      - name: Write the mail config from secrets
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: node tools/write-mail-config.mjs
+
       - name: Sync dist/ to the web host over FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -42,3 +52,18 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
+
+      - name: Check the form endpoint runs and the mail config is private
+        run: |
+          base=https://www.fluxmigrate.com
+          code() { curl -s -o /dev/null -w '%{http_code}' "$base/$1"; }
+          # PHP must execute: a GET is refused with 405. A host that prints the source would answer 200.
+          for i in 1 2 3; do c=$(code contact-submit.php); [ "$c" = 405 ] && break; sleep 10; done
+          [ "$c" = 405 ] || { echo "::error::contact-submit.php answered HTTP $c, expected 405 (is PHP enabled on the host?)"; exit 1; }
+          # the credentials, the deploy state and the mail library must not be served
+          for p in mail-config.php .ftp-deploy-sync-state.json _form/phpmailer/PHPMailer.php; do
+            c=$(code "$p")
+            case "$c" in 403|404) ;; *) echo "::error::$p is publicly readable (HTTP $c)"; exit 1 ;; esac
+          done
+          if curl -s "$base/mail-config.php" | grep -q base64_decode; then echo "::error::mail-config.php content is exposed"; exit 1; fi
+          echo "contact endpoint live, config private"

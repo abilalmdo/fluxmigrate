@@ -6,7 +6,7 @@ import Base from "@/layouts/Base.astro";
 import { breadcrumbSchema, canonicalFor, pageSchema } from "@/lib/site";
 
 const canonical = canonicalFor("/contact");
-const { contact_form_action, contact_form_next, footer_email } = config.params;
+const { contact_form_action, footer_email } = config.params;
 ---
 
 <Base
@@ -29,32 +29,29 @@ const { contact_form_action, contact_form_next, footer_email } = config.params;
 
         <div class="col-12 lg:col-8">
           <div class="p-8 md:p-10 bg-white/5 rounded-3xl corner-squircle">
-            <form action={contact_form_action} method="POST" class="grid gap-5">
-              <input type="hidden" name="_subject" value="New inquiry from fluxmigrate.com" />
-              <input type="hidden" name="_template" value="table" />
-              <input type="hidden" name="_captcha" value="true" />
-              <input type="hidden" name="_next" value={contact_form_next} />
+            <form id="contact-form" action={contact_form_action} method="POST" class="grid gap-5">
+              <input type="hidden" name="ts" value="" />
               <div class="hp-field" aria-hidden="true">
-                <label for="_honey">Leave this field empty</label>
-                <input id="_honey" name="_honey" type="text" tabindex="-1" autocomplete="off" />
+                <label for="hp_url">Leave this field empty</label>
+                <input id="hp_url" name="hp_url" type="text" tabindex="-1" autocomplete="off" />
               </div>
 
               <div class="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label class="field-label" for="name">Name</label>
-                  <input class="form-field" id="name" name="name" type="text" autocomplete="name" required />
+                  <input class="form-field" id="name" name="name" type="text" maxlength="100" autocomplete="name" required />
                 </div>
                 <div>
                   <label class="field-label" for="company">Company</label>
-                  <input class="form-field" id="company" name="company" type="text" autocomplete="organization" required />
+                  <input class="form-field" id="company" name="company" type="text" maxlength="150" autocomplete="organization" required />
                 </div>
                 <div>
                   <label class="field-label" for="email">Business Email</label>
-                  <input class="form-field" id="email" name="email" type="email" autocomplete="email" required />
+                  <input class="form-field" id="email" name="email" type="email" maxlength="254" autocomplete="email" required />
                 </div>
                 <div>
                   <label class="field-label" for="role">Role</label>
-                  <input class="form-field" id="role" name="role" type="text" autocomplete="organization-title" />
+                  <input class="form-field" id="role" name="role" type="text" maxlength="100" autocomplete="organization-title" />
                 </div>
               </div>
 
@@ -67,7 +64,7 @@ const { contact_form_action, contact_form_next, footer_email } = config.params;
 
               <div>
                 <label class="field-label" for="env">Technology Environment</label>
-                <input class="form-field" id="env" name="env" type="text" placeholder="e.g. AWS, Kubernetes, VMware..." />
+                <input class="form-field" id="env" name="env" type="text" maxlength="300" placeholder="e.g. AWS, Kubernetes, VMware..." />
               </div>
 
               <div class="grid gap-5 sm:grid-cols-2">
@@ -87,14 +84,16 @@ const { contact_form_action, contact_form_next, footer_email } = config.params;
 
               <div>
                 <label class="field-label" for="details">Tell us about your requirements</label>
-                <textarea class="form-field" id="details" name="details" rows="5"></textarea>
+                <textarea class="form-field" id="details" name="details" rows="5" maxlength="5000"></textarea>
               </div>
 
               <button type="submit" class="btn btn-primary w-full py-4 text-lg font-medium">Submit</button>
+              <p class="text-center text-sm">We reply within 1 business day.</p>
             </form>
 
-            <div id="sent-banner" class="form-notice mt-6" role="status" hidden>
-              Thanks — your message has been sent. We'll follow up shortly.
+            <div id="form-status" class="form-error mt-6" role="alert" tabindex="-1">
+              We couldn't send your message. Please check the form and try again, or email
+              <a class="link" href={`mailto:${footer_email}`}>{footer_email}</a>.
             </div>
           </div>
         </div>

@@ -14,8 +14,7 @@
     "sticky_header": true
   },
   "params": {
-    "contact_form_action": "https://formsubmit.co/info@fluxmigrate.com",
-    "contact_form_next": "https://www.fluxmigrate.com/contact.html?sent=1",
+    "contact_form_action": "/contact-submit.php",
     "copyright": "&copy; 2026 FluxMigrate. All rights reserved.",
     "footer_tagline": "Cloud infrastructure, DevOps and reliability engineering — as projects or as an extension of your team.",
     "footer_email": "info@fluxmigrate.com"

@@ -1,0 +1,26 @@
+---
+import HeroDecor from "@/components/HeroDecor.astro";
+import config from "@/config/config.json";
+import { thankYouPage as t } from "@/data/content";
+import Base from "@/layouts/Base.astro";
+
+const { footer_email } = config.params;
+---
+
+<Base title={t.title} description={t.description} noindex>
+  <section class="section-ph text-center relative overflow-hidden">
+    <HeroDecor id="ty" />
+    <div class="container relative">
+      <h1 class="h2 mb-4">{t.h1}</h1>
+      <p class="mx-auto max-w-xl">{t.text}</p>
+      <p class="mx-auto max-w-xl mt-3">
+        {t.urgent}{" "}
+        <a class="link" href={`mailto:${footer_email}`}>{footer_email}</a>.
+      </p>
+      <h2 class="h5 mt-12">{t.waitTitle}</h2>
+      <div class="mt-6 flex gap-4 justify-center flex-wrap">
+        {t.next.map((b) => <a href={b.href} class:list={["btn", b.primary ? "btn-primary" : "btn-outline"]}>{b.label}</a>)}
+      </div>
+    </div>
+  </section>
+</Base>

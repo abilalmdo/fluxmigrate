@@ -213,6 +213,12 @@ a.card-tile:focus-visible {
   height: 1px;
   overflow: hidden;
 }
-.form-notice {
-  @apply rounded-2xl border border-primary/40 bg-primary/10 px-6 py-4 text-white;
+/* Shown after a failed send: by script (.is-visible) or, without script, when the server redirects
+   back to /contact.html?error=…#form-status and the fragment targets it. */
+.form-error {
+  @apply hidden rounded-2xl border border-red-400/60 bg-red-500/10 px-6 py-4 text-white;
+}
+.form-error:target,
+.form-error.is-visible {
+  @apply block;
 }

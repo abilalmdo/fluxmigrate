@@ -110,11 +110,54 @@
       });
     });
 
-    // --- contact form: confirmation after formsubmit redirects back --------------
-    const sent = document.getElementById("sent-banner");
-    if (sent && new URLSearchParams(window.location.search).get("sent") === "1") {
-      sent.hidden = false;
-      sent.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+    // --- contact form ----------------------------------------------------------------
+    // Without script the form posts to /contact-submit.php and the server redirects (thank-you page,
+    // or back here with #form-status). With script it submits in place, so an error keeps what the
+    // visitor typed, and success goes to the same thank-you page.
+    const form = document.getElementById("contact-form");
+    const status = document.getElementById("form-status");
+    if (form && status) {
+      const stamp = form.elements.namedItem("ts");
+      if (stamp) stamp.value = String(Date.now()); // the server rejects a form "filled" in under 2.5 s
+      const button = form.querySelector('button[type="submit"]');
+      const label = button ? button.textContent : "";
+      const fallback = status.innerHTML; // generic message with the mailto link
+      const showError = (message) => {
+        if (message) status.textContent = message;
+        else status.innerHTML = fallback;
+        status.classList.add("is-visible");
+        status.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+        status.focus({ preventScroll: true });
+      };
+
+      form.addEventListener("submit", async (e) => {
+        if (!window.fetch) return; // plain post
+        e.preventDefault();
+        status.classList.remove("is-visible");
+        if (button) {
+          button.disabled = true;
+          button.textContent = "Sending…";
+        }
+        try {
+          const res = await fetch(form.action, {
+            method: "POST",
+            body: new FormData(form),
+            headers: { Accept: "application/json" },
+          });
+          const data = await res.json();
+          if (data.ok) {
+            window.location.assign(data.redirect || "/thank-you.html");
+            return;
+          }
+          showError(data.message);
+        } catch {
+          showError();
+        }
+        if (button) {
+          button.disabled = false;
+          button.textContent = label;
+        }
+      });
     }
   }
 

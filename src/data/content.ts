@@ -392,6 +392,20 @@ export const contactPage = {
   engagements: ["Project", "Short-term", "Long-term", "Not sure"],
 };
 
+export const thankYouPage = {
+  title: "Thank you | FluxMigrate",
+  description: "Your message to FluxMigrate has been sent.",
+  h1: "Thanks — we've got your message",
+  text: "We reply within 1 business day, to the email address you gave us.",
+  urgent: "If it is urgent, write to us at",
+  waitTitle: "While you wait",
+  next: [
+    { label: "Back to home", href: "/", primary: true },
+    { label: "Explore our services", href: "/#services", primary: false },
+    { label: "About FluxMigrate", href: "/about.html", primary: false },
+  ],
+};
+
 export const notFound = {
   title: "Page not found | FluxMigrate",
   links: [

@@ -54,7 +54,7 @@ export default defineConfig({
         item.url = u.toString(); // the home page becomes ".../" to match its canonical
         return item;
       },
-      filter: (page) => !page.includes("/404"),
+      filter: (page) => !page.includes("/404") && !page.includes("/thank-you"),
     }),
   ],
 });

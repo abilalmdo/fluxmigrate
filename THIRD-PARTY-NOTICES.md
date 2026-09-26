@@ -13,6 +13,15 @@ fluxmigrate.com is built on the following third-party work.
 - **Images:** the theme states *"Image license: Demonstration purposes only."* None of its
   images are used. All imagery on this site is original (see `tools/images/`).
 
+## PHPMailer (contact form)
+
+- **What:** the SMTP client used by `public/contact-submit.php`. `PHPMailer.php`, `SMTP.php` and
+  `Exception.php` are shipped unmodified in `public/_form/phpmailer/` (version in `VERSION`).
+- **Author:** the PHPMailer project, https://github.com/PHPMailer/PHPMailer
+- **Licence:** GNU LGPL 2.1. The full text is in `public/_form/phpmailer/LICENSE` and ships with the
+  files. The library is used as a separate, unmodified component; to change it, replace those files with
+  a newer release.
+
 ## Fonts
 
 - **Urbanist** and **Inter Tight** — Google Fonts, SIL Open Font License 1.1. Downloaded at build
