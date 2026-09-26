@@ -1,6 +1,7 @@
 ---
 import config from "@/config/config.json";
 import menu from "@/config/menu.json";
+import { phone, telHref } from "@/lib/contact";
 import { markdownify } from "@/lib/utils/textConverter";
 
 const cols = [
@@ -13,13 +14,17 @@ const cols = [
 
 <footer class="section pb-0 relative overflow-hidden">
   <div class="container pb-10">
-    <div class="flex lg:justify-between flex-wrap gap-x-10 gap-y-10">
-      <div class="max-w-95 mb-10 text-lg text-text">
+    <!-- one grid, so every link column starts at the same height and the columns are evenly spaced:
+         phone 2 x 2, tablet brand row + 4 columns, desktop brand + 4 columns on a single row -->
+    <div class="grid grid-cols-2 gap-x-10 gap-y-10 md:grid-cols-4 xl:grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))]">
+      <div class="col-span-full max-w-95 text-lg text-text xl:col-span-1">
         <a href="/" class="inline-flex" aria-label={`${config.site.title} home`}>
-          <img src={config.site.logo} width="198" height="34" alt="" loading="lazy" decoding="async" style="height:34px;width:auto" />
+          <img src={config.site.logo} width={Number(config.site.logo_width)} height={Number(config.site.logo_height)} alt="" loading="lazy" decoding="async" style={`height:${config.site.logo_height}px;width:auto`} />
         </a>
         <p class="mt-6">{config.params.footer_tagline}</p>
-        <a class="link mt-6 inline-block underline" href={`mailto:${config.params.footer_email}`}>
+        <a class="link mt-6 inline-block underline" href={telHref}>{phone.display}</a>
+        <p class="mt-1 text-base text-text-dark">{phone.hours}</p>
+        <a class="link mt-4 inline-block underline" href={`mailto:${config.params.footer_email}`}>
           {config.params.footer_email}
         </a>
       </div>

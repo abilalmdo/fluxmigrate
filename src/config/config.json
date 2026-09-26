@@ -6,8 +6,8 @@
     "trailing_slash": false,
     "favicon": "/favicon.svg",
     "logo": "/brand/fluxmigrate-lockup-horizontal.svg",
-    "logo_width": "198",
-    "logo_height": "34",
+    "logo_width": "244",
+    "logo_height": "44",
     "logo_text": "FluxMigrate"
   },
   "settings": {
@@ -17,7 +17,34 @@
     "contact_form_action": "/contact-submit.php",
     "copyright": "&copy; 2026 FluxMigrate. All rights reserved.",
     "footer_tagline": "Cloud infrastructure, DevOps and reliability engineering — as projects or as an extension of your team.",
-    "footer_email": "info@fluxmigrate.com"
+    "footer_email": "info@fluxmigrate.com",
+    "phone": {
+      "display": "+1 (570) 609-2313",
+      "tel": "+15706092313",
+      "hours": "Mon–Fri, 9:00 AM – 5:00 PM ET"
+    },
+    "offices": [
+      {
+        "id": "pakistan",
+        "label": "Pakistan Office",
+        "street_lines": ["Office # 340M, Street # 25", "Block A, B-17"],
+        "locality": "Islamabad",
+        "region": "",
+        "postal": "",
+        "country": "PK",
+        "country_name": "Pakistan"
+      },
+      {
+        "id": "us",
+        "label": "US Registered Address",
+        "street_lines": ["3400 Road 9"],
+        "locality": "Burlington",
+        "region": "WY",
+        "postal": "82411-9710",
+        "country": "US",
+        "country_name": "USA"
+      }
+    ]
   },
   "navigation_button": {
     "enable": true,

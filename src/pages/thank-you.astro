@@ -3,6 +3,7 @@ import HeroDecor from "@/components/HeroDecor.astro";
 import config from "@/config/config.json";
 import { thankYouPage as t } from "@/data/content";
 import Base from "@/layouts/Base.astro";
+import { phone, telHref } from "@/lib/contact";
 
 const { footer_email } = config.params;
 ---
@@ -15,6 +16,8 @@ const { footer_email } = config.params;
       <p class="mx-auto max-w-xl">{t.text}</p>
       <p class="mx-auto max-w-xl mt-3">
         {t.urgent}{" "}
+        <a class="link" href={telHref}>{phone.display}</a>
+        {" "}({phone.hours}) {t.or}{" "}
         <a class="link" href={`mailto:${footer_email}`}>{footer_email}</a>.
       </p>
       <h2 class="h5 mt-12">{t.waitTitle}</h2>

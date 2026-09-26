@@ -1,146 +1,93 @@
 # FluxMigrate brand guidelines
 
-> **Update, 19 September 2026.** The website now runs on the Automark theme (violet `#937AFF` / `#4D36D0` on near-black), so the site's UI palette is set in `src/config/theme.json`, not by this document. The mark itself is unchanged: its azure-to-violet gradient sits comfortably on that theme, and the rules below still govern the logo. Where this file says "adopt the assets on the site", that is done — the site loads `public/brand/fluxmigrate-lockup-horizontal.svg`, and the other variants live in `docs/brand/svg/` (regenerate with `python tools/brand/genbrand.py`). Colours in the section on the site's own accent (`#38BDF8 → #A855F7`) describe the old site and are historical.
+Version 2.1 — 26 September 2026. Replaces 2.0 (the first 07E logo, regular-weight wordmark) and 1.0 (the
+four-bar mark, kept in [`legacy-four-bar/`](legacy-four-bar/)).
 
-Version 1.0 — 19 September 2026.
+The logo is **option A, purple + red** from `Logo-Design/FluxMigrate-Website-Logo-Refinements/`, supplied by
+the owner. The site's UI palette is set separately in `src/config/theme.json`; this file governs the logo.
 
 ---
 
 ## The mark
 
-Four slanted bars step to the right. The leading bar is detached from the row it belongs to.
-Together they form an implied capital **F** and a picture of what the company sells: workloads
-moving from one platform to another, with the first one already arrived.
+An outlined **F**, a purple **M** locked into it, and a red **play triangle** in the gap between them. The
+wordmark is **FluxMigrate** in bold, with a red dot on the **i**. The red dot and the triangle are the same
+red and are the only warm colour in the mark; keep them exactly as supplied.
 
-Design constraints it was built to satisfy:
+| Part | On dark backgrounds | On light backgrounds |
+| --- | --- | --- |
+| F and wordmark | `#F7F6FC` (off-white) | `#171126` (near-black violet) |
+| M | `#9878E8` (purple) | `#9878E8` |
+| Play triangle and i dot | `#FF0000` (red) | `#FF0000` |
+| The site's ground | `#03010E` | |
 
-- **One idea.** The previous logo combined a cloud, an infinity loop, a gear, code brackets
-  and two arrows. Five metaphors compete; none survives being shrunk.
-- **Legible at 24 px.** Geometry only. No inner detail, no thin strokes, no text inside the mark.
-- **Monochrome-safe.** The mark works filled with a single colour, which the gradient version
-  cannot be assumed to do.
-- **Vector-native.** Every file is SVG. Raster exports are generated, never hand-edited.
+Contrast on the site ground: off-white 19.3:1, purple 6.1:1, red 5.2:1 (from the designer's specification).
 
-The slant is a constant 35° from vertical across all four bars, so the mark keeps one optical
-axis at any size.
+**Wordmark:** set in Segoe UI Variable, weight 700, size 104 units (the earlier weight-600, size-93 version
+was replaced as too small). It is supplied as outlined paths, so it renders identically without any font
+installed. Segoe UI Variable is a Microsoft font; its licence terms for use in a logo have not been checked
+here, so confirm them with the designer before the logo is used in print or trademarked.
 
 ---
 
 ## Files
 
-### Vector sources
+Sources in `docs/brand/svg/`, produced by `tools/brand/import-logo.mjs` from the delivered folder:
 
 | File | Use |
 | --- | --- |
-| `fluxmigrate-mark.svg` | icon only, gradient, transparent background |
-| `fluxmigrate-mark-white.svg` | icon on dark or photographic backgrounds |
-| `fluxmigrate-mark-ink.svg` | icon on white or light backgrounds |
-| `fluxmigrate-lockup-horizontal.svg` | **primary logo** — icon + wordmark, for dark backgrounds |
-| `fluxmigrate-lockup-horizontal-dark.svg` | same lockup with ink wordmark, for light backgrounds |
-| `fluxmigrate-lockup-horizontal-white.svg` | one-colour white, for print and overlays |
-| `fluxmigrate-lockup-horizontal-ink.svg` | one-colour black, for fax, stamps, single-colour print |
-| `fluxmigrate-lockup-vertical.svg` | stacked lockup for square-ish spaces |
-| `fluxmigrate-lockup-dotcom.svg` | alternate reading `fluxmigrate.com`, matches the current site nav |
-| `fluxmigrate-favicon.svg` | simplified three-shape mark on a dark tile, for 16–48 px |
-| `fluxmigrate-app-tile.svg` | full-bleed square tile, for app icons and avatars |
-| `fluxmigrate-og.svg` | 1200 × 630 social card |
+| `fluxmigrate-horizontal.svg` | **primary logo** for dark backgrounds: site header and footer (`public/brand/fluxmigrate-lockup-horizontal.svg`), OG card |
+| `fluxmigrate-horizontal-light.svg` | the same logo for white and pale backgrounds (documents, e-mail, print) |
+| `fluxmigrate-stacked.svg`, `-stacked-light.svg` | mark above wordmark, for square-ish spaces |
+| `fluxmigrate-icon.svg`, `-icon-light.svg` | the mark alone (`public/brand/fluxmigrate-mark.svg` is the dark one); used inside the illustrations |
+| `fluxmigrate-favicon.svg` | mark on a rounded `#03010E` tile, for browser tabs (`public/favicon.svg`) |
+| `fluxmigrate-app-tile.svg` | the same tile, square-cornered, for app icons and `apple-touch-icon.png` |
 
-### Generated exports (`png/`)
+Exports in `docs/brand/png/` (from `node tools/brand/export.mjs`): `logo-horizontal.png` (2400 px) and `@4800`,
+`logo-horizontal-light.png`, `logo-stacked.png`, `logo-stacked-light.png`, `logo-icon.png`, `logo-icon-light.png`,
+`app-tile-1024.png`, `apple-touch-icon.png` (180), `favicon-16/32/48/192/512.png` and `favicon.ico` (16–256).
+The logo PNGs are transparent.
 
-`logo-icon.png` (1024) · `logo-icon@2048.png` · `logo-icon-white.png` (1024) ·
-`logo-lockup.png` (2400 × 412) · `logo-lockup@4800.png` (4800 × 824) ·
-`logo-lockup-white.png` · `logo-lockup-ink.png` · `logo-lockup-dotcom.png` ·
-`logo-vertical.png` (1600) · `app-tile-1024.png` · `apple-touch-icon.png` (180) ·
-`favicon-16/32/48/192/512.png` · `favicon.ico` (7 sizes, 16–256) ·
-`og-image.png` (1200 × 630) · `og-image@2x.png` (2400 × 1260).
+The delivered folder also has a `horizontal-larger` variant (same size, weight 600) and a red-and-gold option B.
+Neither is used; they stay in `Logo-Design/`.
 
-All PNGs carry an alpha channel except the two Open Graph cards, which are flattened onto
-`#070B14` because social scrapers handle transparency inconsistently.
-
-To regenerate every file, see the Brand assets section of the repository README.
+The social card (`public/images/og-image.png`) and the mark drawn inside three illustrations (home overview
+sidebar, About, Industries) are generated by `pnpm images` from these sources.
 
 ---
 
-## Colour
+## Where it may be used
 
-| Name | Hex | Use |
-| --- | --- | --- |
-| Azure | `#2D8FF5` | gradient start, primary accent, links |
-| Violet | `#7C5CFC` | gradient end, secondary accent only |
-| Ink | `#070B14` | logo on light, page ground |
-| Tile | `#0B1020` | favicon and app-icon background |
-| Paper | `#FFFFFF` | reversed logo |
+Use the **dark** files on the site and on any dark ground, and the **light** files on white or pale grounds.
+Never put the dark logo on a light background (the F and wordmark vanish), or the light one on a dark one.
 
-The gradient runs bottom-left to top-right, azure to violet, across the mark's bounding box
-only — never across a whole page or a large panel.
+Site rules (set here, not by the designer; revise if they specify otherwise):
 
-This is a deliberate tightening of the site's current `#38BDF8 → #A855F7`. That pairing is
-the default cyan-to-purple of almost every AI-generated tech brand of the last three years.
-Moving the blue toward true azure and the purple away from magenta reads as infrastructure
-rather than as a generative-art preset, and keeps contrast on the dark ground.
-
-**Single-colour rule.** Below 24 px, or in any one-colour context, use the flat white or flat
-ink mark. The gradient is decoration; it must never be load-bearing.
-
----
-
-## Wordmark
-
-Inter Display SemiBold, tracking −0.015 em, converted to outlines. The lockup files contain
-vector paths, not `<text>`, so they render identically without Inter installed.
-
-Preferred wordmark is **FluxMigrate**, capital F and capital M, no domain suffix. The
-`.com` alternate exists to match the current site header; prefer it only where the domain
-itself is the message, such as a business card or an ad.
-
----
-
-## Clear space and minimum size
-
-- **Clear space:** one bar height (`10/64` of the mark's height) on every side. Nothing
-  enters that zone.
-- **Minimum size, horizontal lockup:** 120 px wide on screen, 30 mm in print.
-- **Minimum size, mark alone:** 24 px. Below that, use `fluxmigrate-favicon.svg`, which
-  drops the fourth bar and thickens the remaining three.
+- **Header:** the horizontal logo is 216 px wide from 1280 px up, and up to 244 px wide (capped so the menu
+  button always fits) below that. Above 1280 px the logo, the eight-item nav pill and the "Talk to a
+  Specialist" button share one row of about 1,200 px; a larger logo or wider nav gaps push the button onto a
+  second row, so re-check with `node` + a browser at 1280, 1440 and 1920 px after any change to them.
+- **Footer:** 244 × 44 px.
+- **Never below** 120 px wide (horizontal logo) or 24 px (mark alone). Below that use the favicon tile.
+- **Clear space:** at least the height of the red triangle on every side.
 
 ## Don't
 
-- Do not re-add the cloud, gear, infinity or code-bracket motifs.
-- Do not rotate, skew, mirror or re-space the bars.
-- Do not apply shadows, glows, bevels or outlines to the mark.
-- Do not place the gradient mark on a mid-tone or busy background — use white or ink there.
-- Do not recolour the bars individually.
-- Do not set the wordmark in a different family and call it the logo.
+- Do not recolour any part of the logo, and do not merge the purple and red.
+- Do not place it on a mid-tone or busy background.
+- Do not rotate, skew, stretch, outline, add shadows or glows to it.
+- Do not retype the wordmark in another font.
+- Do not bring back the four-bar mark or the cloud/gear/infinity motifs (see `legacy-four-bar/`).
 
 ---
 
-## Adopting the new assets on the site
+## Changing the logo again
 
-The HTML still points at the legacy raster files in `assets/`. When the new identity is
-approved, the swap is mechanical:
-
-1. Copy `assets/brand/png/*` over the matching names in `assets/`, and copy
-   `assets/brand/fluxmigrate-favicon.svg` to `assets/favicon.svg`.
-2. In all ten HTML files, change `assets/logo-icon.png` to `assets/brand/fluxmigrate-mark.svg`
-   (twice per page: nav and footer) and add `width` and `height` attributes.
-3. Add `<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">` ahead of the PNG
-   favicon links, so modern browsers take the vector.
-4. Update the `:root` colour tokens to the palette above if the tightened colours are adopted.
-
-Step 1 alone removes roughly 2.2 MB of image payload from the site.
-
----
-
-## Rejected concepts
-
-Kept for the record, as `concept-b-mark.svg` and `concept-c-mark.svg`.
-
-- **Concept B, Migration Arc.** A source node, a rising arc and an arrowhead into a target
-  node. The meaning is the most literal of the three, but the arc is a thin stroke that
-  disappears below 32 px, and the composition is close to a generic "export" UI icon.
-- **Concept C, Shift Tiles.** Two rounded tiles offset on a diagonal, one outlined and one
-  filled. It scales beautifully but carries no letterform and reads as the standard
-  duplicate/copy icon rather than as a company.
-
-Concept A was chosen because it is the only one of the three that is simultaneously
-distinctive, letter-bearing and legible at favicon size.
+1. Put the delivered folder next to the repo (like `Logo-Design/`).
+2. `node tools/brand/import-logo.mjs "../Logo-Design/<folder>"` writes the sources. It reads
+   `*-{horizontal,stacked,icon}[-bold]-dark.svg` and, if present, the matching `-light.svg`.
+3. `node tools/brand/export.mjs` writes the PNG/ICO exports and refreshes `public/`.
+4. `pnpm images` refreshes the OG card and the illustrations that draw the mark.
+5. Set `logo_width` / `logo_height` in `src/config/config.json` to the new lockup's aspect ratio (the header
+   sizes are in `src/layouts/components/Logo.astro`), then `pnpm build && node tools/verify-dist.mjs` and look
+   at the header at the widths above, the footer and a tab.

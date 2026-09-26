@@ -2,6 +2,9 @@
  * SVG scene toolkit for the site's illustrations.
  * Colours follow the Automark theme tokens in src/config/theme.json.
  */
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { glyphAt } from "./icons.mjs";
 
 export const C = {
@@ -90,7 +93,15 @@ export const line = (x1, y1, x2, y2, { stroke = "#ffffff26", sw = 1.5, dash = ""
 export const path = (d, { stroke = "#ffffff26", sw = 1.5, fill = "none", dash = "", op = 1, cap = "round" } = {}) =>
   `<path d="${d}" stroke="${stroke}" stroke-width="${sw}" fill="${fill}" stroke-linecap="${cap}" stroke-linejoin="round" ${dash ? `stroke-dasharray="${dash}"` : ""} opacity="${op}"/>`;
 
-/** the brand's slanted-bar workload token */
+/** the FluxMigrate mark (F + M + play triangle) from the brand sources, centred on (x, y) at the given height */
+export function brandMark(x, y, height) {
+  const svg = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "..", "docs", "brand", "svg", "fluxmigrate-icon.svg"), "utf8");
+  const inner = svg.match(/<g transform="translate\([^)]*\)">([\s\S]*?)<\/g>/)[1]; // mark spans x 10..138, y 5..130
+  const s = height / 125;
+  return `<g transform="translate(${x} ${y}) scale(${s}) translate(-74 -67.5)">${inner}</g>`;
+}
+
+/** a small slanted-bar "workload" chip used in the diagrams (not the logo) */
 export function token(x, y, s = 1, fill = "url(#pri)") {
   return `<g transform="translate(${x} ${y}) scale(${s})" fill="${fill}"><path d="M8 0h22l-6 9H2z"/><path d="M33 0h8l-6 9h-8z"/></g>`;
 }

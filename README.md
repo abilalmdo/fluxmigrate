@@ -56,7 +56,7 @@ fluxmigrate/
 │   │   ├── config.json          site title, URL, logo, contact form endpoint, footer text, CTA button
 │   │   ├── menu.json            header nav (flat row + Services dropdown) and footer columns
 │   │   └── theme.json           colours and fonts → generates src/styles/generated-theme.css
-│   ├── pages/                   index, [slug] (the 8 content pages), contact, thank-you, 404
+│   ├── pages/                   index, [slug] (the 8 content pages), contact, contact-us, thank-you, 404
 │   ├── layouts/
 │   │   ├── Base.astro           <head>, SEO, JSON-LD slots, skip link, scripts
 │   │   ├── partials/            Header (accessible menu + dropdown), Footer
@@ -67,17 +67,17 @@ fluxmigrate/
 ├── public/
 │   ├── images/{icons,heroes}/   generated illustrations (see "Images")
 │   ├── images/og-image.png      social card
-│   ├── brand/                   the three logo SVGs the site loads
+│   ├── brand/                   the horizontal logo and the mark (SVG) the site loads
 │   ├── contact-submit.php       the contact form back end (the only server code)
 │   ├── _form/                   PHPMailer (LGPL) for the form; web access denied
 │   ├── favicon*, apple-touch-icon.png, site.webmanifest, robots.txt, .htaccess
 ├── tools/
 │   ├── images/                  original icon + illustration generator (SVG → WebP/PNG)
-│   ├── brand/                   logo SVG generator + exports (Python + Node)
+│   ├── brand/                   logo import + export scripts (Node); legacy-four-bar/ = retired generators
 │   ├── form-test/               contact-form tests: real PHP in Docker + a fake SMTP server
 │   ├── write-mail-config.mjs    CI step: writes dist/mail-config.php from GitHub secrets
 │   └── verify-dist.mjs          post-build verifier, also run in CI
-├── docs/brand/                  brand guidelines, logo sources/exports, review screenshots
+├── docs/brand/                  brand guidelines, logo sources (svg/) and exports (png/), legacy-four-bar/
 ├── Dockerfile, nginx.conf, docker-compose.yml
 ├── .github/workflows/deploy.yml
 ├── LICENSE-THEME-AUTOMARK, THIRD-PARTY-NOTICES.md
@@ -90,7 +90,7 @@ The site was static HTML with `.html` URLs, and search engines have indexed them
 configured with `build.format: "file"`, so every page keeps its address:
 
 `/`, `/about.html`, `/contact.html`, `/technology.html`, `/industries.html`,
-`/cloud-migration.html`, `/devops-platform-engineering.html`,
+`/contact-us.html`, `/cloud-migration.html`, `/devops-platform-engineering.html`,
 `/sre-reliability-engineering.html`, `/vmware-modernization.html`, `/staff-augmentation.html`,
 `/404.html`, `/thank-you.html` (noindex, not in the sitemap). Canonicals, `og:url`, the sitemap and every internal link use that `.html` form.
 
@@ -103,6 +103,8 @@ configured with `build.format: "file"`, so every page keeps its address:
 | Copy on any page, service cards, tabs, CTAs, meta title/description | `src/data/content.ts` |
 | Header nav, Services dropdown, footer columns | `src/config/menu.json` |
 | Site title, URL, footer tagline, email, contact-form endpoint | `src/config/config.json` |
+| Phone number, opening hours, office addresses | `params.phone`, `params.offices` in `src/config/config.json`. The phone shows in the footer, contact page, mobile menu and thank-you page; the addresses show on `/contact.html` and `/contact-us.html` only (not the footer); JSON-LD reads both |
+| "Contact Us" page wording | `contactUsPage` in `src/data/content.ts` (footer link: `menu.json` → `footer_company`) |
 | Thank-you page wording | `thankYouPage` in `src/data/content.ts` |
 | Who receives enquiries, SMTP host/user | GitHub secrets (see "Contact form"), not a file in the repo |
 | Colours, fonts | `src/config/theme.json` (then `pnpm dev`/`build` regenerates the CSS) |
@@ -118,10 +120,14 @@ Nav has two layers and neither replaces the other:
 
 - **Flat row** (`menu.json` → `main`): Staff Augmentation, DevOps, SRE, VMware, Technology,
   Industries, About — as on the original site.
-- **Services dropdown** (`menu.json` → `main[0].children`, mirrored in the footer): FluxMigrate's
+- **Services dropdown** (`menu.json` → `main[0].children`): FluxMigrate's
   five service pages under their own names, plus four categories with no page of their own yet
   (DevSecOps, Kubernetes Services, FinOps Consulting, Well-Architected Review) that anchor into
   the nine-card Services section on the home page (`/#service-…`).
+
+The **footer** Services column is a separate, shorter list (`menu.json` → `footer_services`, five links at most; a footer column
+never exceeds five, and `verify-dist` enforces it). Where the site already has a matching service the link goes to it, otherwise
+to `/contact.html`. Changing it does not touch the header dropdown.
 
 If you rename an existing service, match its own page's `<h1>`, not another company's wording
 for a similar thing.
@@ -145,7 +151,7 @@ node tools/images/build.mjs heroes sre-reliability    # one scene
   a control-plane overview for the home page and one per content page. They are deliberately
   *illustrative*: no client names, logos, or numeric metrics, and each carries an
   "Illustrative view" caption. Vendor names appear as text only.
-- **OG image** (`scenes/og.mjs`): 1200×630 PNG, built from the brand lockup and the overview scene.
+- **OG image** (`scenes/og.mjs`): 1200×630 PNG, built from the horizontal logo and the overview scene.
 - Text inside images is set in Inter (`tools/images/fonts/`, SIL OFL) through resvg, so no font
   needs installing on the machine that builds them.
 
@@ -153,11 +159,17 @@ Generated files are committed; CI does not need to run the generator.
 
 ### Brand assets
 
-`tools/brand/genbrand.py` (needs `pip install fonttools`) writes every logo SVG to
-`docs/brand/svg/` and copies the three the site uses to `public/brand/`;
-`node tools/brand/export.mjs` writes PNG exports to `docs/brand/png/` and refreshes the favicons in
-`public/`. Rules and rejected concepts: [`docs/brand/BRAND-GUIDELINES.md`](docs/brand/BRAND-GUIDELINES.md).
-`favicon.ico` (multi-size) is built once with Pillow from `docs/brand/png/favicon-512.png`.
+The logo is the owner-supplied option A, purple + red (F + M + play triangle, bold wordmark with a red i dot), with
+a dark-background and a light-background version. Sources live in `docs/brand/svg/`, exports in `docs/brand/png/`.
+
+```bash
+node tools/brand/import-logo.mjs "../Logo-Design/<delivered folder>"  # writes docs/brand/svg/*
+node tools/brand/export.mjs                                          # PNG/ICO exports, refreshes public/
+pnpm images                                                          # OG card + illustrations that draw the mark
+```
+
+Rules (which file on which background, header sizes, don'ts) and the retired four-bar mark:
+[`docs/brand/BRAND-GUIDELINES.md`](docs/brand/BRAND-GUIDELINES.md).
 
 ---
 
@@ -220,6 +232,11 @@ contact.html --fetch--> contact-submit.php --SMTP--> mailbox (forms@) --> info@f
   Actions*, or run `gh secret set SMTP_PASSWORD` (it prompts, so the value never lands in shell history).
 - **Rotating the password:** change the mailbox password in cPanel, update `SMTP_PASSWORD`, re-run the
   deploy workflow.
+- **Local preview with a working form:** `pnpm build`, then `bash tools/form-test/preview.sh` inside WSL (start it hidden
+  with `Start-Process` so WSL stays awake; the header of that file has the exact command). It serves `dist/` with real PHP at
+  http://localhost:8088 and keeps each enquiry in a fake SMTP server instead of sending it; read them with
+  `node tools/form-test/show-mail.mjs`. Stop it with `bash tools/form-test/preview.sh stop`. It shares port 8088 with the nginx
+  preview, so run one at a time.
 - **Local dev:** `pnpm dev` and the nginx preview do not run PHP, so submitting there does not work.
   Test the back end with
   `wsl -e bash -lc "cd /mnt/d/FluxMigrate/fluxmigrate && pnpm build && bash tools/form-test/run.sh"`

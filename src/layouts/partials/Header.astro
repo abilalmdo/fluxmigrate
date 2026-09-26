@@ -2,6 +2,7 @@
 import Logo from "@/components/Logo.astro";
 import config from "@/config/config.json";
 import menu from "@/config/menu.json";
+import { phone, telHref } from "@/lib/contact";
 
 interface NavLink {
   name: string;
@@ -49,7 +50,7 @@ const childActive = (item: NavLink) =>
 
     <ul
       id="nav-menu"
-      class="navbar-nav order-3 hidden xl:flex xl:flex-row w-full py-6 max-xl:mt-5 xl:order-1 xl:w-auto xl:gap-x-4 2xl:gap-x-7 xl:py-0 bg-light/95 xl:bg-dark/30 backdrop-blur-lg rounded-2xl xl:rounded-full xl:corner-squircle px-6"
+      class="navbar-nav order-3 hidden xl:flex xl:flex-row w-full py-6 max-xl:mt-5 xl:order-1 xl:w-auto xl:gap-x-2 xl:py-0 bg-light/95 xl:bg-dark/30 backdrop-blur-lg rounded-2xl xl:rounded-full xl:corner-squircle px-6"
     >
       {
         main.map((item) =>
@@ -99,6 +100,9 @@ const childActive = (item: NavLink) =>
           </li>
         )
       }
+      <li class="pt-3 inline-block xl:hidden">
+        <a class="btn btn-outline w-full text-center" href={telHref}>Call {phone.display}</a>
+      </li>
     </ul>
 
     <div class="order-1 ml-auto flex items-center xl:ml-0 xl:order-2 max-xl:mr-3">

@@ -4,9 +4,13 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const dist = join(import.meta.dirname, "..", "dist");
+const cfg = JSON.parse(readFileSync(join(import.meta.dirname, "..", "src", "config", "config.json"), "utf8")).params;
+const PHONE_TEL = cfg.phone.tel;
+const OFFICE_LABELS = cfg.offices.map((o) => o.label);
+const ADDRESS_PAGES = new Set(["contact.html", "contact-us.html"]);
 const SITE = "https://www.fluxmigrate.com";
 const EXPECTED = [
-  "index", "about", "contact", "technology", "industries", "cloud-migration",
+  "index", "about", "contact", "contact-us", "technology", "industries", "cloud-migration",
   "devops-platform-engineering", "sre-reliability-engineering", "vmware-modernization", "staff-augmentation",
 ];
 
@@ -87,6 +91,19 @@ for (const [file, src] of Object.entries(html)) {
     fail(file, `third-party load: ${m[1]}`);
   }
   if (/fonts\.(googleapis|gstatic)\.com|cdn\.jsdelivr|unpkg\.com|cdnjs/.test(src)) fail(file, "references a font/script CDN");
+  // the phone number must be a tap-to-call link on every page, in the footer, matching config.json
+  if (!src.includes(`href="tel:${PHONE_TEL}"`)) fail(file, `no tap-to-call link for ${PHONE_TEL}`);
+  // the addresses live on the contact pages only, not in the footer of every page
+  for (const label of OFFICE_LABELS) {
+    const has = src.replace(/<script[\s\S]*?<\/script>/g, "").includes(label); // visible text only; JSON-LD names the offices on the home page
+    if (ADDRESS_PAGES.has(file) && !has) fail(file, `office "${label}" missing`);
+    if (!ADDRESS_PAGES.has(file) && has) fail(file, `office "${label}" must not appear on this page`);
+  }
+  // footer link columns stay short and even: at most five links each
+  for (const ul of (src.match(/<footer[\s\S]*?<\/footer>/) || [""])[0].match(/<ul[\s\S]*?<\/ul>/g) || []) {
+    const n = (ul.match(/<li[\s>]/g) || []).length;
+    if (n > 5) fail(file, `a footer column has ${n} links (max 5)`);
+  }
   // no form may post to another site (the contact form uses our own /contact-submit.php)
   for (const m of src.matchAll(/<form\b[^>]*\saction="([^"]*)"/g)) {
     if (m[1] !== "/contact-submit.php") fail(file, `form posts to ${m[1]}`);
@@ -100,6 +117,17 @@ for (const f of ["contact-submit.php", "_form/.htaccess", "_form/phpmailer/PHPMa
 if (!/action="\/contact-submit\.php"/.test(html["contact.html"] || "")) fail("contact.html", "form does not post to /contact-submit.php");
 const ht = existsSync(join(dist, ".htaccess")) ? readFileSync(join(dist, ".htaccess"), "utf8") : "";
 if (!/FilesMatch[^\n]*mail-config\\\.php/.test(ht)) fail(".htaccess", "does not deny mail-config.php");
+// structured data must carry the same phone and offices the page prints
+{
+  const org = [...(html["index.html"] || "").matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map((m) => JSON.parse(m[1])).find((o) => o["@type"] === "Organization");
+  if (!org) fail("index", "no Organization JSON-LD");
+  else {
+    if (org.telephone !== PHONE_TEL) fail("index", `Organization.telephone ${org.telephone} != ${PHONE_TEL}`);
+    if ((org.address || []).length !== cfg.offices.length) fail("index", "Organization.address does not list every office");
+  }
+}
+
 // sitemap
 const sm = existsSync(join(dist, "sitemap-0.xml")) ? readFileSync(join(dist, "sitemap-0.xml"), "utf8") : "";
 for (const slug of EXPECTED) {

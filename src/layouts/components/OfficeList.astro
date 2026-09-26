@@ -1,0 +1,26 @@
+---
+import { officeLines, offices } from "@/lib/contact";
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div class:list={["grid gap-5", className]}>
+  {
+    offices.map((o) => (
+      <address class="not-italic">
+        <p class="font-semibold text-white">{o.label}</p>
+        <p class="mt-1 text-text-dark">
+          {officeLines(o).map((line, i) => (
+            <Fragment>
+              {i > 0 && <br />}
+              {line}
+            </Fragment>
+          ))}
+        </p>
+      </address>
+    ))
+  }
+</div>

@@ -1,4 +1,5 @@
 import config from "@/config/config.json";
+import { offices, phone, streetOf } from "@/lib/contact";
 
 /** Canonical public URL for a request path. Pages are served as <slug>.html (build.format = "file"). */
 export function canonicalFor(pathname: string): string {
@@ -26,12 +27,24 @@ export const organizationSchema = {
   description:
     "FluxMigrate designs, migrates, automates and operates modern cloud and hybrid infrastructure, and provides Cloud, DevOps, Platform and SRE engineers to extend client teams.",
   email: config.params.footer_email,
+  telephone: phone.tel,
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "sales",
     email: config.params.footer_email,
+    telephone: phone.tel,
     availableLanguage: ["English"],
   },
+  // the Pakistan office and the US registered address, exactly as printed in the footer
+  address: offices.map((o) => ({
+    "@type": "PostalAddress",
+    name: o.label,
+    streetAddress: streetOf(o),
+    addressLocality: o.locality,
+    ...(o.region ? { addressRegion: o.region } : {}),
+    ...(o.postal ? { postalCode: o.postal } : {}),
+    addressCountry: o.country,
+  })),
   knowsAbout: [
     "Cloud migration", "AWS", "Microsoft Azure", "Google Cloud Platform", "Kubernetes",
     "OpenShift", "VMware", "OpenStack", "Terraform", "Ansible", "DevOps",

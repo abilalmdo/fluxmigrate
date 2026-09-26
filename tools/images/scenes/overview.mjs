@@ -1,4 +1,4 @@
-import { C, badge, circle, end, glyphAt, line, panel, path, pill, rect, scene, t, token } from "../lib.mjs";
+import { C, badge, brandMark, circle, end, glyphAt, line, panel, path, pill, rect, scene, t, token } from "../lib.mjs";
 
 /** Home hero: an illustrative "control plane" view — migration corridor, delivery pipeline,
  *  service-level monitoring, clusters, environments and runbooks. No client data, no metrics. */
@@ -29,7 +29,7 @@ export default function overview() {
   // ---- sidebar -------------------------------------------------------------
   parts.push(rect(56, 112, 216, 744, { r: 0, fill: "#ffffff04" }));
   parts.push(line(272, 112, 272, 856, { stroke: "#ffffff10", sw: 1 }));
-  parts.push(`<g transform="translate(86 140) scale(.9)">${token(0, 0, 1)}${token(0, 15, 1)}${token(0, 30, 1)}</g>`);
+  parts.push(brandMark(105, 158, 34));
   parts.push(t(146, 164, "FluxMigrate", { size: 17, fill: C.white, weight: 600 }));
   const nav = [
     ["compass", "Overview", true],

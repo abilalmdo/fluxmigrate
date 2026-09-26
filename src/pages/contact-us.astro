@@ -1,0 +1,57 @@
+---
+import CtaBand from "@/components/CtaBand.astro";
+import PageHero from "@/components/PageHero.astro";
+import config from "@/config/config.json";
+import { contactUsPage as c } from "@/data/content";
+import Base from "@/layouts/Base.astro";
+import { officeLines, offices, phone, telHref } from "@/lib/contact";
+import { breadcrumbSchema, canonicalFor, pageSchema } from "@/lib/site";
+
+const canonical = canonicalFor("/contact-us");
+const { footer_email } = config.params;
+---
+
+<Base
+  title={c.title}
+  description={c.description}
+  schema={[breadcrumbSchema("Contact Us", canonical), pageSchema("ContactPage", "Contact Us", canonical, c.description)]}
+>
+  <PageHero h1={c.h1} subtitle={c.subtitle} />
+
+  <section class="section pt-0">
+    <div class="container">
+      <div class="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
+        <div class="card-tile">
+          <h2 class="text-h5-sm font-bold">{c.call.title}</h2>
+          <p class="mt-3 text-text-dark">{c.call.text}</p>
+          <a class="link mt-6 inline-block text-lg" href={telHref}>{phone.display}</a>
+          <p class="mt-1 text-sm text-text-dark">{phone.hours}</p>
+        </div>
+
+        <div class="card-tile">
+          <h2 class="text-h5-sm font-bold">{c.email.title}</h2>
+          <p class="mt-3 text-text-dark">{c.email.text}</p>
+          <a class="link mt-6 inline-block text-lg" href={`mailto:${footer_email}`}>{footer_email}</a>
+        </div>
+
+        {
+          offices.map((o) => (
+            <div class="card-tile">
+              <h2 class="text-h5-sm font-bold">{o.label}</h2>
+              <address class="mt-4 not-italic text-text-dark">
+                {officeLines(o).map((line, i) => (
+                  <Fragment>
+                    {i > 0 && <br />}
+                    {line}
+                  </Fragment>
+                ))}
+              </address>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title={c.closing.title} text={c.closing.text} button={c.closing.cta} />
+</Base>

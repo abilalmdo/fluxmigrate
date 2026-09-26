@@ -1,4 +1,4 @@
-import { C, badge, circle, end, glyphAt, line, panel, path, pill, rect, scene, t, token } from "../lib.mjs";
+import { C, badge, brandMark, circle, end, glyphAt, line, panel, path, pill, rect, scene, t } from "../lib.mjs";
 
 /** Industries: four sectors around one engineering approach. */
 export default function industries() {
@@ -42,7 +42,7 @@ export default function industries() {
   p.push(circle(cx, cy, 108, { fill: "#0B0C17", stroke: "#937AFF", sw: 1.6 }));
   p.push(circle(cx, cy, 108, { fill: "url(#glowP)", op: 0.5 }));
   p.push(circle(cx, cy, 134, { stroke: "#937AFF", sw: 1, op: 0.3 }));
-  p.push(`<g transform="translate(${cx - 40} ${cy - 62}) scale(1.75)">${token(0, 0, 1)}${token(0, 15, 1)}${token(0, 30, 1)}</g>`);
+  p.push(brandMark(cx - 2, cy - 26, 72));
   p.push(t(cx, cy + 74, "ONE APPROACH", { size: 13, fill: "#CFC3FF", weight: 600, anchor: "middle", ls: 2 }));
 
   return scene(p.join("\n"));

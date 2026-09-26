@@ -1,8 +1,10 @@
 ---
 import config from "@/config/config.json";
+import OfficeList from "@/components/OfficeList.astro";
 import PageHero from "@/components/PageHero.astro";
 import { contactPage as c } from "@/data/content";
 import Base from "@/layouts/Base.astro";
+import { phone, telHref } from "@/lib/contact";
 import { breadcrumbSchema, canonicalFor, pageSchema } from "@/lib/site";
 
 const canonical = canonicalFor("/contact");
@@ -18,16 +20,18 @@ const { contact_form_action, footer_email } = config.params;
 
   <section class="section pt-0">
     <div class="container">
-      <div class="row g-7 max-lg:gap-5">
-        <div class="col-12 lg:col-4">
-          <div class="card-tile lg:sticky lg:top-32">
-            <h2 class="text-h5-sm font-bold">Prefer email?</h2>
-            <p class="mt-3 text-text-dark">Write to us directly and tell us about your environment.</p>
-            <a class="link mt-6 inline-block" href={`mailto:${footer_email}`}>{footer_email}</a>
-          </div>
+      <!-- phone card, form, offices: in that order on a phone; on desktop the form spans the
+           right two-thirds and the two cards stack on the left -->
+      <div class="grid gap-x-10 gap-y-6 lg:grid-cols-12 lg:grid-rows-[auto_1fr]">
+        <div class="card-tile self-start lg:col-span-4 lg:col-start-1 lg:row-start-1">
+          <h2 class="text-h5-sm font-bold">Prefer to talk?</h2>
+          <p class="mt-3 text-text-dark">Call and speak with one of our specialists, or write to us and tell us about your environment.</p>
+          <a class="link mt-6 inline-block text-lg" href={telHref}>{phone.display}</a>
+          <p class="mt-1 text-sm text-text-dark">{phone.hours}</p>
+          <a class="link mt-4 inline-block" href={`mailto:${footer_email}`}>{footer_email}</a>
         </div>
 
-        <div class="col-12 lg:col-8">
+        <div class="lg:col-span-8 lg:col-start-5 lg:row-span-2 lg:row-start-1">
           <div class="p-8 md:p-10 bg-white/5 rounded-3xl corner-squircle">
             <form id="contact-form" action={contact_form_action} method="POST" class="grid gap-5">
               <input type="hidden" name="ts" value="" />
@@ -96,6 +100,11 @@ const { contact_form_action, footer_email } = config.params;
               <a class="link" href={`mailto:${footer_email}`}>{footer_email}</a>.
             </div>
           </div>
+        </div>
+
+        <div class="card-tile self-start lg:col-span-4 lg:col-start-1 lg:row-start-2">
+          <h2 class="text-h5-sm font-bold">Our offices</h2>
+          <OfficeList class="mt-5" />
         </div>
       </div>
     </div>

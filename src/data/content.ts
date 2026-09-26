@@ -392,12 +392,29 @@ export const contactPage = {
   engagements: ["Project", "Short-term", "Long-term", "Not sure"],
 };
 
+export const contactUsPage = {
+  slug: "contact-us",
+  title: "Contact Us | FluxMigrate",
+  description:
+    "Contact FluxMigrate: call our specialists, email us, or find our Pakistan office and US registered address.",
+  h1: "Contact **Us**",
+  subtitle: "Call or email FluxMigrate, and find our office and registered address.",
+  call: { title: "Call us", text: "Speak directly with one of our specialists." },
+  email: { title: "Email us", text: "Tell us about your environment. We reply within 1 business day." },
+  closing: {
+    title: "Prefer to write it **down**?",
+    text: "Send us the details of your project or the engineers you need and we will follow up.",
+    cta: { label: "Send us a message", href: "/contact.html" },
+  },
+};
+
 export const thankYouPage = {
   title: "Thank you | FluxMigrate",
   description: "Your message to FluxMigrate has been sent.",
   h1: "Thanks — we've got your message",
   text: "We reply within 1 business day, to the email address you gave us.",
-  urgent: "If it is urgent, write to us at",
+  urgent: "If it is urgent, call",
+  or: "or write to",
   waitTitle: "While you wait",
   next: [
     { label: "Back to home", href: "/", primary: true },
@@ -420,6 +437,7 @@ export const notFound = {
       { name: "Technology", href: "/technology.html" },
       { name: "Industries", href: "/industries.html" },
       { name: "About", href: "/about.html" },
+      { name: "Contact Us", href: "/contact-us.html" },
     ] },
     { title: "Get started", items: [
       { name: "Plan a project", href: "/contact.html" },

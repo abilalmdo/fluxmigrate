@@ -1,6 +1,6 @@
-import { C, badge, circle, end, glyphAt, line, panel, path, pill, rect, scene, t, token } from "../lib.mjs";
+import { C, badge, brandMark, circle, end, glyphAt, line, panel, path, pill, rect, scene, t } from "../lib.mjs";
 
-/** About: design, build, migrate and operate as one continuous loop around the mark. */
+/** About: design, build, migrate and operate as one continuous loop around the FluxMigrate mark. */
 export default function about() {
   const p = [];
   const cx = 800, cy = 450, R = 290;
@@ -37,7 +37,7 @@ export default function about() {
   // centre
   p.push(circle(cx, cy, 128, { fill: "#0B0C17", stroke: "#937AFF", sw: 1.6 }));
   p.push(circle(cx, cy, 128, { fill: "url(#glowP)", op: 0.55 }));
-  p.push(`<g transform="translate(${cx - 62} ${cy - 56}) scale(2.7)">${token(0, 0, 1)}${token(0, 15, 1)}${token(0, 30, 1)}</g>`);
+  p.push(brandMark(cx, cy - 4, 110));
   p.push(t(cx, cy + 92, "BUILD · OPERATE", { size: 12, fill: "#CFC3FF", weight: 600, anchor: "middle", ls: 2 }));
 
   // flanking notes

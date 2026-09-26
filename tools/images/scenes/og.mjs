@@ -16,7 +16,7 @@ ${DEFS}
 <rect width="1200" height="630" fill="url(#grid)" opacity=".8"/>
 <circle cx="900" cy="330" r="420" fill="url(#glowD)" opacity=".9"/>
 <circle cx="120" cy="60" r="280" fill="url(#glowP)" opacity=".35"/>
-<g transform="translate(70 72) scale(1.15)">${inner}</g>
+<g transform="translate(62 66) scale(0.34)">${inner}</g>
 <text x="70" y="232" font-size="58" font-weight="600" fill="#fff" letter-spacing="-1.4">Modern infrastructure,</text>
 <text x="70" y="298" font-size="58" font-weight="600" fill="url(#pri)" letter-spacing="-1.4">engineered for change.</text>
 <text x="70" y="358" font-size="24" font-weight="500" fill="${C.text}" opacity=".85">Cloud · DevOps · SRE · Engineering</text>
