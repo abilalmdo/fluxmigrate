@@ -140,6 +140,7 @@ if (!/action="\/contact-submit\.php"/.test(html["contact.html"] || "")) fail("co
   }
 }
 const ht = existsSync(join(dist, ".htaccess")) ? readFileSync(join(dist, ".htaccess"), "utf8") : "";
+if (!/^\s*RewriteCond %\{HTTP_HOST\} \^fluxmigrate\\\.com\$/m.test(ht) || !/^\s*RewriteRule \^ https:\/\/www\.fluxmigrate\.com%\{REQUEST_URI\} \[R=301,L\]/m.test(ht)) fail(".htaccess", "no active fluxmigrate.com -> www redirect (FM-109)");
 if (!/FilesMatch[^\n]*mail-config\\\.php/.test(ht)) fail(".htaccess", "does not deny mail-config.php");
 // structured data must carry the same phone and offices the page prints
 {

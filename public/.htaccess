@@ -10,6 +10,14 @@ ErrorDocument 404 /404.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # One site address (tasks FM-305, FM-109): fluxmigrate.com and www.fluxmigrate.com were both answering 200,
+  # and a browser keeps its saved choices (cookie consent, "already subscribed") per address, so a visitor
+  # who arrived on one and followed an email link to the other was asked everything again. Send the bare
+  # domain to www, keeping the path and query string. The http to https step is already done by the host
+  # (verified with curl), so it is deliberately not repeated here: that is where a redirect loop could start.
+  RewriteCond %{HTTP_HOST} ^fluxmigrate\.com$ [NC]
+  RewriteRule ^ https://www.fluxmigrate.com%{REQUEST_URI} [R=301,L]
+
   RewriteCond %{THE_REQUEST} \s/index\.html[\s?] [NC]
   RewriteRule ^index\.html$ / [R=301,L]
 
@@ -17,13 +25,6 @@ ErrorDocument 404 /404.html
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME}.html -f
   RewriteRule ^(.+)$ $1.html [L]
-
-  # One canonical origin (task FM-305). Uncomment once the host's TLS/CDN setup is confirmed,
-  # otherwise a proxy that terminates TLS can cause a redirect loop:
-  #   RewriteCond %{HTTPS} off
-  #   RewriteRule ^ https://www.fluxmigrate.com%{REQUEST_URI} [R=301,L]
-  #   RewriteCond %{HTTP_HOST} ^fluxmigrate\.com$ [NC]
-  #   RewriteRule ^ https://www.fluxmigrate.com%{REQUEST_URI} [R=301,L]
 </IfModule>
 
 # --- contact form (task FM-106) -----------------------------------------------

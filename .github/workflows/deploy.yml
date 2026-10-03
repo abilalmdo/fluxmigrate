@@ -65,6 +65,9 @@ jobs:
           [ "$c" = 405 ] || { echo "::error::contact-submit.php answered HTTP $c, expected 405 (is PHP enabled on the host?)"; exit 1; }
           # the captcha endpoint must issue a question (proves PHP, the config and the guard library all load)
           curl -s "$base/contact-captcha.php" | grep -q '"question"' || { echo "::error::contact-captcha.php did not return a question"; exit 1; }
+          # one site address: the bare domain must send visitors to www (their saved choices are kept per address)
+          r=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' https://fluxmigrate.com/about.html)
+          [ "$r" = "301 https://www.fluxmigrate.com/about.html" ] || { echo "::error::fluxmigrate.com did not redirect to www ($r)"; exit 1; }
           # newsletter endpoints must run PHP (GET on a POST-only endpoint is 405) and the library must stay private
           c=$(code subscribe.php); [ "$c" = 405 ] || { echo "::error::subscribe.php answered HTTP $c, expected 405"; exit 1; }
           # the credentials, the deploy state and the mail library must not be served

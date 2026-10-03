@@ -311,8 +311,8 @@ files that no longer exist (the old `assets/` folder and hand-written pages) are
 host on the first run.
 
 `public/.htaccess` (Apache/LiteSpeed) provides the 404 page, extensionless URLs, `/index.html`→`/`,
-caching, gzip and security headers. The http→https and non-www→www redirects are written but
-commented out until the host's TLS/CDN setup is confirmed — see FM-305.
+caching, gzip and security headers. The host already redirects http→https; the `.htaccess` redirects the bare domain to www (FM-109: browsers keep consent and
+"subscribed" per address, so two live addresses meant being asked twice). The deploy workflow checks it.
 
 ## Licences
 
