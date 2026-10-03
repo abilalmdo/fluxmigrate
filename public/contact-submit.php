@@ -124,7 +124,7 @@ $need = fm_field('need', 100);
 $env = fm_field('env', 300);
 $count = fm_field('count', 50);
 $engagement = fm_field('engagement', 50);
-$details = fm_field('details', 5000, true);
+$details = fm_field('details', 2000, true);
 
 foreach (array($name, $company, $email, $role, $need, $env, $count, $engagement, $details) as $v) {
     if ($v === false) {

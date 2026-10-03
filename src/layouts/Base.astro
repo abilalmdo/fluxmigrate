@@ -1,6 +1,8 @@
 ---
 import config from "@/config/config.json";
 import theme from "@/config/theme.json";
+import ConsentBanner from "@/components/ConsentBanner.astro";
+import OptInPopup from "@/components/OptInPopup.astro";
 import Footer from "@/partials/Footer.astro";
 import Header from "@/partials/Header.astro";
 import { absolute, canonicalFor } from "@/lib/site";
@@ -18,11 +20,13 @@ export interface Props {
   description?: string;
   image?: string;
   noindex?: boolean;
+  /** Newsletter popup. Default: on for indexable pages, off for utility pages; pass false to switch it off (contact page). */
+  popup?: boolean;
   /** JSON-LD objects; rendered as separate <script type="application/ld+json"> blocks */
   schema?: object[];
 }
 
-const { title, meta_title, description, image, noindex, schema = [] } = Astro.props;
+const { title, meta_title, description, image, noindex, popup = !noindex, schema = [] } = Astro.props;
 
 const pageTitle = plainify(meta_title || title || config.site.title);
 const pageDescription = plainify(description || config.metadata.meta_description);
@@ -78,13 +82,16 @@ const ogImage = absolute(image || config.metadata.meta_image);
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
+    <ConsentBanner />
     <Header />
     <main id="main-content">
       <slot />
     </main>
     <Footer />
+    {popup && <OptInPopup />}
 
     <script>
+      import "@/scripts/consent.js";
       import "@/scripts/main.js";
       import "@/scripts/animations.js";
     </script>

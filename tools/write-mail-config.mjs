@@ -33,6 +33,8 @@ const config = {
   from: env.MAIL_FROM || env.SMTP_USER,
   to: env.MAIL_TO || "info@fluxmigrate.com",
 };
+if (env.SITE_URL) config.site_url = env.SITE_URL; // links in newsletter mails; default https://www.fluxmigrate.com
+if (env.DATA_DIR) config.data_dir = env.DATA_DIR; // newsletter database folder; default: "fm-data" beside the web root
 if (env.ALLOWED_HOSTS) config.allowed_hosts = env.ALLOWED_HOSTS.split(",").map((h) => h.trim().toLowerCase());
 
 const payload = Buffer.from(JSON.stringify(config)).toString("base64");

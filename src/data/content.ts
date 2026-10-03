@@ -424,6 +424,31 @@ export const thankYouPage = {
   ],
 };
 
+/** Newsletter opt-in popup (FM-108). `consent` must equal FM_CONSENT_TEXT in public/_form/subscribers.php; verify-dist checks. */
+export const optIn = {
+  title: "Stay in the loop",
+  text: "Blog posts, our newsletter and service updates on cloud migration, DevOps and reliability engineering, straight to your inbox.",
+  consent: "I agree to receive emails from FluxMigrate: blog posts, the newsletter and service updates. I can unsubscribe at any time.",
+  submit: "Subscribe",
+  note: "We email you once to confirm. No spam, and we never share your address.",
+  privacyLabel: "Privacy Policy",
+};
+
+export const subscriptionPage = {
+  title: "Email subscription | FluxMigrate",
+  description: "Confirm or manage your FluxMigrate email subscription.",
+  h1: "Email subscription",
+  states: {
+    pending: { title: "Check your inbox", text: "We sent you an email with a confirmation link. Open it to finish subscribing. If it has not arrived in a few minutes, look in your spam folder." },
+    confirmed: { title: "You are subscribed", text: "Thank you. Your subscription is confirmed." },
+    unsubscribed: { title: "You are unsubscribed", text: "We will not email you again. You can subscribe again any time." },
+    invalid: { title: "That link did not work", text: "The link is not valid, or has already been replaced. Subscribe again from any page on the site." },
+    error: { title: "Something went wrong", text: "We could not complete that just now. Please try again in a few minutes." },
+  },
+  idle: "Use the link in one of our emails to confirm or unsubscribe.",
+  back: { label: "Back to home", href: "/" },
+};
+
 export const notFound = {
   title: "Page not found | FluxMigrate",
   links: [

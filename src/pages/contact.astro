@@ -12,6 +12,7 @@ const { contact_form_action, footer_email } = config.params;
 ---
 
 <Base
+  popup={false}
   title={c.title}
   description={c.description}
   schema={[breadcrumbSchema("Contact", canonical), pageSchema("ContactPage", "Contact", canonical, c.description)]}
@@ -88,7 +89,8 @@ const { contact_form_action, footer_email } = config.params;
 
               <div>
                 <label class="field-label" for="details">Tell us about your requirements</label>
-                <textarea class="form-field" id="details" name="details" rows="5" maxlength="5000"></textarea>
+                <textarea class="form-field" id="details" name="details" rows="5" maxlength="2000" aria-describedby="details-count"></textarea>
+                <p id="details-count" class="mt-2 text-right text-sm text-text-dark" data-limit="2000">2000 characters left</p>
               </div>
 
               <!-- Self-hosted captcha: main.js fetches a question from /contact-captcha.php and reveals this -->
@@ -103,7 +105,7 @@ const { contact_form_action, footer_email } = config.params;
               </noscript>
 
               <button type="submit" class="btn btn-primary w-full py-4 text-lg font-medium">Submit</button>
-              <p class="text-center text-sm">We reply within 1 business day.</p>
+              <p class="text-center text-sm">We reply within 1 business day. <a class="link underline" href="/privacy-policy.html">Privacy Policy</a></p>
             </form>
 
             <div id="form-status" class="form-error mt-6" role="alert" tabindex="-1">

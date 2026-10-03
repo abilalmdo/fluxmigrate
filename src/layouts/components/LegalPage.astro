@@ -1,0 +1,66 @@
+---
+import PageHero from "@/components/PageHero.astro";
+import config from "@/config/config.json";
+import type { LegalDoc } from "@/data/legal";
+import Base from "@/layouts/Base.astro";
+import { phone, telHref } from "@/lib/contact";
+import { breadcrumbSchema, canonicalFor, pageSchema } from "@/lib/site";
+
+// Shared by /privacy-policy.html and /terms-of-service.html. Copy lives in src/data/legal.ts.
+export interface Props {
+  doc: LegalDoc;
+  crumb: string;
+}
+const { doc, crumb } = Astro.props;
+const canonical = canonicalFor(`/${doc.slug}`);
+const { footer_email } = config.params;
+const schema = [breadcrumbSchema(crumb, canonical), pageSchema("WebPage", crumb, canonical, doc.description)];
+---
+
+<Base title={doc.title} description={doc.description} schema={schema}>
+  <PageHero h1={doc.h1} subtitle={doc.subtitle} />
+
+  <section class="section relative pt-0">
+    <div class="container">
+      <div class="mx-auto max-w-4xl grid gap-6">
+        <article class="card-tile">
+          {doc.intro.map((p, i) => <p class:list={["text-text-dark", i > 0 && "mt-3"]}>{p}</p>)}
+          <p class="mt-6 text-sm text-text-dark">Last updated: {doc.updated}</p>
+          <nav aria-label="On this page" class="mt-6">
+            <ul class="grid gap-2 text-text-dark sm:grid-cols-2">
+              {doc.sections.map((s) => <li><a class="link underline" href={`#${s.id}`}>{s.title}</a></li>)}
+              <li><a class="link underline" href="#contact">Contact us</a></li>
+            </ul>
+          </nav>
+        </article>
+
+        {
+          doc.sections.map((s) => (
+            <article class="card-tile scroll-mt-28" id={s.id}>
+              <h2 class="text-h5-sm font-bold">{s.title}</h2>
+              {s.paragraphs?.map((p) => <p class="mt-3 text-text-dark">{p}</p>)}
+              {s.list && <ul class="stars-list mt-4 text-text-dark">{s.list.map((li) => <li>{li}</li>)}</ul>}
+              {s.after?.map((p) => <p class="mt-4 text-text-dark">{p}</p>)}
+            </article>
+          ))
+        }
+
+        <article class="card-tile scroll-mt-28" id="contact">
+          <h2 class="text-h5-sm font-bold">Contact us</h2>
+          <p class="mt-3 text-text-dark">
+            Questions about this page, or a request about your data: write to{" "}
+            <a class="link underline" href={`mailto:${footer_email}`}>{footer_email}</a>, call{" "}
+            <a class="link underline" href={telHref}>{phone.display}</a>, or see our{" "}
+            <a class="link underline" href="/contact-us.html">Contact Us</a> page for our postal addresses.
+          </p>
+          <p class="mt-3 text-text-dark">
+            Related:{" "}
+            <a class="link underline" href="/privacy-policy.html">Privacy Policy</a>,{" "}
+            <a class="link underline" href="/terms-of-service.html">Terms of Service</a>,{" "}
+            <a class="link underline" href="/cookie-policy.html">Cookie Policy</a>.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+</Base>

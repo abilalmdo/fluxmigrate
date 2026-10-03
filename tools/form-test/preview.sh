@@ -18,7 +18,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
-PORT=8088
+PORT=${PORT:-8088}
 SITE=/tmp/fm-preview
 SINK=/tmp/smtp-sink.jsonl
 
@@ -39,7 +39,7 @@ fi
 stop
 cp -r dist "$SITE"
 DIST_DIR="$SITE" SMTP_HOST=127.0.0.1 SMTP_PORT=2525 SMTP_SECURE=none SMTP_USER=forms@fluxmigrate.com \
-  SMTP_PASSWORD=preview-only ALLOWED_HOSTS="localhost,127.0.0.1" node tools/write-mail-config.mjs
+  SMTP_PASSWORD=preview-only ALLOWED_HOSTS="localhost,127.0.0.1" DATA_DIR=/tmp/fm-data-preview SITE_URL="http://localhost:$PORT" node tools/write-mail-config.mjs
 
 docker run -d --rm --name fm-preview --network host -v "$SITE":/site:ro php:8.3-cli \
   php -S "0.0.0.0:$PORT" -t /site >/dev/null

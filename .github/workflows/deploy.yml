@@ -43,6 +43,9 @@ jobs:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          # optional: where the newsletter database lives (default: "fm-data" beside the web root) and the link base in its mails
+          DATA_DIR: ${{ secrets.DATA_DIR }}
+          SITE_URL: ${{ secrets.SITE_URL }}
         run: node tools/write-mail-config.mjs
 
       - name: Sync dist/ to the web host over FTP
@@ -62,8 +65,10 @@ jobs:
           [ "$c" = 405 ] || { echo "::error::contact-submit.php answered HTTP $c, expected 405 (is PHP enabled on the host?)"; exit 1; }
           # the captcha endpoint must issue a question (proves PHP, the config and the guard library all load)
           curl -s "$base/contact-captcha.php" | grep -q '"question"' || { echo "::error::contact-captcha.php did not return a question"; exit 1; }
+          # newsletter endpoints must run PHP (GET on a POST-only endpoint is 405) and the library must stay private
+          c=$(code subscribe.php); [ "$c" = 405 ] || { echo "::error::subscribe.php answered HTTP $c, expected 405"; exit 1; }
           # the credentials, the deploy state and the mail library must not be served
-          for p in mail-config.php .ftp-deploy-sync-state.json _form/phpmailer/PHPMailer.php _form/guard.php; do
+          for p in mail-config.php .ftp-deploy-sync-state.json _form/phpmailer/PHPMailer.php _form/guard.php _form/subscribers.php fm-data/subscribers.sqlite; do
             c=$(code "$p")
             case "$c" in 403|404) ;; *) echo "::error::$p is publicly readable (HTTP $c)"; exit 1 ;; esac
           done

@@ -68,7 +68,8 @@ fluxmigrate/
 │   ├── images/{icons,heroes}/   generated illustrations (see "Images")
 │   ├── images/og-image.png      social card
 │   ├── brand/                   the horizontal logo and the mark (SVG) the site loads
-│   ├── contact-submit.php       the contact form back end (the only server code)
+│   ├── contact-submit.php       the contact form back end
+│   ├── contact-captcha.php, subscribe*.php   captcha questions and the newsletter opt-in (FM-107, FM-108)
 │   ├── _form/                   PHPMailer (LGPL) for the form; web access denied
 │   ├── favicon*, apple-touch-icon.png, site.webmanifest, robots.txt, .htaccess
 ├── tools/
@@ -92,7 +93,7 @@ configured with `build.format: "file"`, so every page keeps its address:
 `/`, `/about.html`, `/contact.html`, `/technology.html`, `/industries.html`,
 `/contact-us.html`, `/aiops-services.html`, `/cloud-migration.html`, `/devops-platform-engineering.html`,
 `/sre-reliability-engineering.html`, `/vmware-modernization.html`, `/staff-augmentation.html`,
-`/404.html`, `/thank-you.html` (noindex, not in the sitemap). Canonicals, `og:url`, the sitemap and every internal link use that `.html` form.
+`/privacy-policy.html`, `/terms-of-service.html`, `/cookie-policy.html`, `/404.html`, `/thank-you.html`, `/subscription.html` (noindex, not in the sitemap). Canonicals, `og:url`, the sitemap and every internal link use that `.html` form.
 
 ---
 
@@ -107,6 +108,7 @@ configured with `build.format: "file"`, so every page keeps its address:
 | AIOps page and home AIOps section (tracks, services, scenarios) | `src/data/aiops.ts` (tracks, services) and `src/data/aiops-detail.ts` (per-service capabilities and scenarios, track pages); art in `tools/images/scenes/aiops.mjs` |
 | "Contact Us" page wording | `contactUsPage` in `src/data/content.ts` (footer link: `menu.json` → `footer_company`) |
 | Thank-you page wording | `thankYouPage` in `src/data/content.ts` |
+| Privacy Policy and Terms of Service text | `src/data/legal.ts` (shared page `LegalPage.astro`); footer links in `menu.json` → `footer_legal`. Standard-form text: keep it true to the site and update the date when a tool that handles personal data is added |
 | Who receives enquiries, SMTP host/user | GitHub secrets (see "Contact form"), not a file in the repo |
 | Colours, fonts | `src/config/theme.json` (then `pnpm dev`/`build` regenerates the CSS) |
 | Page structure or a component | `src/pages/*` and `src/layouts/*` |
@@ -258,6 +260,42 @@ contact.html --fetch--> contact-submit.php --SMTP--> mailbox (forms@) --> info@f
   or the real mailbox: the deploy workflow checks the first, and one real enquiry checks the second.
 - **Changing fields:** add the input in `contact.astro`, plus a matching `fm_field(...)` line and a body
   line in `contact-submit.php`. Length limits live in both places (`maxlength` and the PHP).
+
+---
+
+## Newsletter opt-in
+
+A popup (`src/layouts/components/OptInPopup.astro`, wired in `main.js`) collects an email address with consent and saves it for the team.
+Copy is in `optIn` in `src/data/content.ts` (no choice of topics: every subscriber gets blog posts, the newsletter and service updates); the landing page wording is `subscriptionPage` there.
+
+```
+popup --fetch--> subscribe.php --> subscribers.sqlite (status: pending) --SMTP--> visitor: "confirm" link
+                                                                                      |
+/subscription.html#confirmed <-- subscribe-confirm.php (status: confirmed) --SMTP--> info@: "New subscriber"
+/subscription.html#unsubscribed <-- subscribe-unsubscribe.php (status: unsubscribed)
+```
+
+- **Where the addresses are:** `fm-data/subscribers.sqlite`, in the hosting account's home folder beside `public_html` (default: the parent
+  of the web root). Set the optional GitHub secret `DATA_DIR` to put it elsewhere. It must be **outside the web root**: the FTP deploy deletes
+  anything it did not upload and a web server would serve anything inside. The code refuses a folder inside the web root.
+- **Reading the list:** download `subscribers.sqlite` with cPanel File Manager and open it in a SQLite viewer (DB Browser for SQLite is free),
+  or rely on the "New subscriber" mail sent to `MAIL_TO` on every confirmation. Columns: `email`, `interests` (always `blog,newsletter,updates`),
+  `status` (`pending`, `confirmed`, `unsubscribed`), `consent_text`, `source_page`, `ip_hash` (keyed hash, not the IP), `confirm_token`,
+  `unsub_token`, `created_at`, `confirm_sent_at`, `confirmed_at`, `unsubscribed_at`. Mailing list = `status = 'confirmed'`.
+- **Consent:** unticked required checkbox, wording `optIn.consent`, stored with the row. It must equal `FM_CONSENT_TEXT` in
+  `public/_form/subscribers.php` (`verify-dist` checks). Double opt-in: nothing counts until the link in the confirmation mail is opened.
+- **Sending:** this collects and stores addresses; it does not send newsletters. Every mail you send must carry
+  `https://www.fluxmigrate.com/subscribe-unsubscribe.php?t=<unsub_token>` for that row. Bulk mail from shared hosting hurts deliverability;
+  prefer exporting confirmed rows to a sending service.
+- **Protection:** same layers as the contact form (captcha, honeypot, fill time, Origin check, strikes and lockout), plus 5 sign-ups per IP and
+  100 overall per hour. The reply never says whether an address is already on the list.
+- **Popup behaviour:** opens after 25 s or 40% scroll, once per 30 days (remembered in `localStorage` key `fm-optin`, only with the visitor's
+  functional-storage consent, see the consent banner), never on contact, thank-you, subscription and 404 pages (`popup` prop of `Base.astro`).
+  Any element with `data-optin-open` reopens it.
+- **Config:** optional secrets `DATA_DIR` and `SITE_URL` (link base in mails; default `https://www.fluxmigrate.com`), written into
+  `mail-config.php` by `tools/write-mail-config.mjs`. Needs PHP's `pdo_sqlite` (normally on).
+- **Local test:** `bash tools/form-test/run.sh` (phases `sub-main`, `sub-abuse`, `sub-rate`); for a browser, `PORT=8090 bash tools/form-test/preview.sh`
+  (use another port if the nginx preview holds 8088), then read mails with `node tools/form-test/show-mail.mjs`.
 
 ---
 

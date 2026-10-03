@@ -1,4 +1,4 @@
-/* Small UI behaviours: mobile menu, Services dropdown, header reveal, tabs, form banner. */
+/* Small UI behaviours: mobile menu, Services dropdown, header reveal, tabs, form banner, newsletter popup. */
 (function () {
   "use strict";
 
@@ -110,18 +110,19 @@
       });
     });
 
-    // --- contact form ----------------------------------------------------------------
-    // Without script the form posts to /contact-submit.php and the server redirects (thank-you page,
-    // or back here with #form-status). With script it submits in place, so an error keeps what the
-    // visitor typed, and success goes to the same thank-you page.
-    const form = document.getElementById("contact-form");
-    const status = document.getElementById("form-status");
-    if (form && status) {
+    // --- forms that post to our own PHP endpoints ----------------------------------------
+    // Without script a form posts normally and the server redirects. With script it submits in place,
+    // so an error keeps what the visitor typed. Each form asks /contact-captcha.php for a question
+    // (self-hosted captcha, FM-107); the signed token comes back with it and works once.
+    function wireForm(o) {
+      const form = document.getElementById(o.form);
+      const status = document.getElementById(o.status);
+      if (!form || !status) return null;
       const stamp = form.elements.namedItem("ts");
       if (stamp) stamp.value = String(Date.now()); // the server rejects a form "filled" in under 2.5 s
       const button = form.querySelector('button[type="submit"]');
       const label = button ? button.textContent : "";
-      const fallback = status.innerHTML; // generic message with the mailto link
+      const fallback = status.innerHTML; // generic message (may carry a mailto link)
       const showError = (message) => {
         if (message) status.textContent = message;
         else status.innerHTML = fallback;
@@ -130,10 +131,9 @@
         status.focus({ preventScroll: true });
       };
 
-      // Self-hosted captcha: ask the server for a question; the signed token comes back with it.
-      const captchaBox = document.getElementById("captcha-field");
-      const captchaLabel = document.getElementById("captcha-label");
-      const captchaInput = document.getElementById("captcha");
+      const captchaBox = document.getElementById(o.captcha + "-field");
+      const captchaLabel = document.getElementById(o.captcha + "-label");
+      const captchaInput = document.getElementById(o.captcha);
       const captchaToken = form.elements.namedItem("captcha_token");
       const loadCaptcha = async () => {
         if (!captchaBox || !window.fetch) return false;
@@ -151,14 +151,14 @@
           return false;
         }
       };
-      loadCaptcha();
+      if (!o.lazy) loadCaptcha();
 
       form.addEventListener("submit", async (e) => {
         if (!window.fetch) return; // plain post
         e.preventDefault();
         status.classList.remove("is-visible");
         if (!captchaToken.value && !(await loadCaptcha())) {
-          showError("The security check could not load. Please try again in a moment, or email us.");
+          showError("The security check could not load. Please try again in a moment.");
           return;
         }
         if (!captchaInput.value.trim()) {
@@ -177,11 +177,12 @@
           });
           const data = await res.json();
           if (data.ok) {
-            window.location.assign(data.redirect || "/thank-you.html");
+            if (o.onSuccess) o.onSuccess();
+            window.location.assign(data.redirect || o.redirect);
             return;
           }
           showError(data.message);
-          if (data.code !== "invalid") {
+          if (!["invalid", "consent"].includes(data.code)) {
             // The server spends a token on every attempt that got past validation, so ask for a fresh question
             captchaToken.value = "";
             await loadCaptcha();
@@ -197,6 +198,212 @@
           button.textContent = label;
         }
       });
+      return { loadCaptcha };
+    }
+
+    wireForm({ form: "contact-form", status: "form-status", captcha: "captcha", redirect: "/thank-you.html" });
+
+    // custom dropdowns for the contact form selects. The native <select> stays in the DOM (hidden) so the form
+    // still posts it and works without script; the listbox below only mirrors it.
+    document.querySelectorAll("#contact-form select.form-field").forEach((native) => {
+      const label = document.querySelector(`label[for="${native.id}"]`);
+      const wrap = document.createElement("div");
+      wrap.className = "fm-select";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "form-field fm-select-btn";
+      btn.setAttribute("aria-haspopup", "listbox");
+      btn.setAttribute("aria-expanded", "false");
+      if (label) {
+        label.id = label.id || native.id + "-label";
+        btn.setAttribute("aria-labelledby", label.id);
+      }
+      const value = document.createElement("span");
+      btn.append(value);
+      btn.insertAdjacentHTML("beforeend", '<svg class="fm-select-chevron" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+      const list = document.createElement("ul");
+      list.className = "fm-select-list";
+      list.setAttribute("role", "listbox");
+      list.tabIndex = -1;
+      if (label) list.setAttribute("aria-labelledby", label.id);
+      const opts = [...native.options].map((o, i) => {
+        const li = document.createElement("li");
+        li.setAttribute("role", "option");
+        li.id = `${native.id}-opt-${i}`;
+        li.className = "fm-select-opt";
+        li.innerHTML = '<span></span><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        li.firstChild.textContent = o.textContent;
+        list.append(li);
+        return li;
+      });
+      let active = native.selectedIndex;
+      const sync = () => {
+        value.textContent = native.options[native.selectedIndex]?.textContent || "";
+        opts.forEach((li, i) => li.setAttribute("aria-selected", String(i === native.selectedIndex)));
+      };
+      const setActive = (i) => {
+        active = Math.max(0, Math.min(opts.length - 1, i));
+        opts.forEach((li, j) => li.classList.toggle("is-active", j === active));
+        btn.setAttribute("aria-activedescendant", opts[active].id);
+        opts[active].scrollIntoView({ block: "nearest" });
+      };
+      const isOpen = () => wrap.classList.contains("is-open");
+      const open = () => {
+        wrap.classList.add("is-open");
+        btn.setAttribute("aria-expanded", "true");
+        setActive(native.selectedIndex);
+      };
+      const close = () => {
+        wrap.classList.remove("is-open");
+        btn.setAttribute("aria-expanded", "false");
+        btn.removeAttribute("aria-activedescendant");
+      };
+      const choose = (i) => {
+        native.selectedIndex = i;
+        native.dispatchEvent(new Event("change", { bubbles: true }));
+        sync();
+        close();
+      };
+      btn.addEventListener("click", () => (isOpen() ? close() : open()));
+      opts.forEach((li, i) => {
+        li.addEventListener("mousemove", () => setActive(i));
+        li.addEventListener("click", () => {
+          choose(i);
+          btn.focus();
+        });
+      });
+      let typed = "";
+      let typedTimer;
+      btn.addEventListener("keydown", (e) => {
+        const k = e.key;
+        const printable = k.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && !(k === " " && !typed);
+        if (!isOpen()) {
+          if (["ArrowDown", "ArrowUp", "Enter", " "].includes(k) && !printable) {
+            e.preventDefault();
+            open();
+          }
+        } else if (k === "ArrowDown") {
+          e.preventDefault();
+          setActive(active + 1);
+        } else if (k === "ArrowUp") {
+          e.preventDefault();
+          setActive(active - 1);
+        } else if (k === "Home" || k === "End") {
+          e.preventDefault();
+          setActive(k === "Home" ? 0 : opts.length - 1);
+        } else if (k === "Enter" || (k === " " && !printable)) {
+          e.preventDefault();
+          choose(active);
+        } else if (k === "Escape") {
+          e.preventDefault();
+          close();
+        } else if (k === "Tab") {
+          close();
+        }
+        if (printable) {
+          typed += k.toLowerCase();
+          clearTimeout(typedTimer);
+          typedTimer = setTimeout(() => (typed = ""), 600);
+          const hit = [...native.options].findIndex((o) => o.textContent.toLowerCase().startsWith(typed));
+          if (hit >= 0) {
+            if (isOpen()) setActive(hit);
+            else choose(hit);
+          }
+        }
+      });
+      document.addEventListener("pointerdown", (e) => { if (!wrap.contains(e.target)) close(); });
+      if (label) label.addEventListener("click", (e) => { e.preventDefault(); btn.focus(); });
+      native.addEventListener("change", sync);
+      native.classList.remove("form-field");
+      native.classList.add("fm-select-native");
+      native.tabIndex = -1;
+      native.setAttribute("aria-hidden", "true");
+      native.parentNode.insertBefore(wrap, native);
+      wrap.append(btn, list, native);
+      sync();
+    });
+
+    // live "characters left" counter under the requirements box (limit = maxlength, mirrored server-side)
+    const detailsBox = document.getElementById("details");
+    const detailsCount = document.getElementById("details-count");
+    if (detailsBox && detailsCount) {
+      const limit = Number(detailsBox.getAttribute("maxlength")) || 2000;
+      const updateCount = () => {
+        const left = Math.max(0, limit - detailsBox.value.length);
+        detailsCount.textContent = left + (left === 1 ? " character left" : " characters left");
+        detailsCount.classList.toggle("text-red-400", left <= 100);
+        detailsCount.classList.toggle("text-text-dark", left > 100);
+      };
+      detailsBox.addEventListener("input", updateCount);
+      updateCount();
+    }
+
+    // --- newsletter opt-in popup (FM-108) ------------------------------------------------
+    // Opens once per visitor per 30 days: after 25 s on the page or once 40% has been scrolled,
+    // whichever comes first. Closing it (button, Escape, click outside) or subscribing silences it.
+    // Anything with data-optin-open reopens it on request. Without <dialog> support nothing happens.
+    const optin = document.getElementById("optin");
+    if (optin && typeof optin.showModal === "function") {
+      const KEY = "fm-optin";
+      const MUTE_MS = 30 * 24 * 3600 * 1000;
+      const muted = () => {
+        try {
+          const t = Number(localStorage.getItem(KEY));
+          return t > 0 && Date.now() - t < MUTE_MS;
+        } catch {
+          return false;
+        }
+      };
+      // remembering the dismissal is Functional storage: only with consent (consent.js, FM-705)
+      const allowed = () => !!(window.fmConsent && window.fmConsent.has("functional"));
+      const mute = () => {
+        if (!allowed()) return;
+        try {
+          localStorage.setItem(KEY, String(Date.now()));
+        } catch {}
+      };
+      const page = optin.querySelector('input[name="page"]');
+      if (page) page.value = window.location.pathname;
+      const wired = wireForm({
+        form: "optin-form",
+        status: "optin-status",
+        captcha: "optin-captcha",
+        redirect: "/subscription.html#pending",
+        lazy: true,
+        onSuccess: mute,
+      });
+      const open = () => {
+        if (optin.open) return;
+        optin.showModal();
+        if (wired) wired.loadCaptcha();
+        const first = optin.querySelector("input[type=email]");
+        if (first) first.focus();
+      };
+      const auto = () => {
+        if (optin.open) return;
+        if (!window.fmConsent || !window.fmConsent.get()) return void setTimeout(auto, 8000); // not before the consent choice
+        if (!allowed() || muted()) return;
+        const busy = document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+        const menuOpen = toggle && toggle.getAttribute("aria-expanded") === "true";
+        if (busy || menuOpen) return void setTimeout(auto, 8000); // not while they are typing or navigating
+        open();
+      };
+      const timer = setTimeout(auto, 25000);
+      const onScroll = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        if (max > 0 && window.scrollY / max > 0.4) {
+          window.removeEventListener("scroll", onScroll);
+          clearTimeout(timer);
+          auto();
+        }
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      optin.addEventListener("close", mute);
+      optin.addEventListener("click", (e) => {
+        if (e.target === optin) optin.close(); // click on the backdrop
+      });
+      optin.querySelectorAll("[data-optin-close]").forEach((b) => b.addEventListener("click", () => optin.close()));
+      document.querySelectorAll("[data-optin-open]").forEach((b) => b.addEventListener("click", open));
     }
   }
 

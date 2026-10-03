@@ -1,0 +1,33 @@
+---
+import HeroDecor from "@/components/HeroDecor.astro";
+import { subscriptionPage as t } from "@/data/content";
+import Base from "@/layouts/Base.astro";
+
+const states = Object.entries(t.states);
+---
+
+<!-- Landing page for the links in the opt-in mails and for the end of the sign-up. The server redirects
+     to /subscription.html#pending | #confirmed | #unsubscribed | #invalid | #error and CSS :target shows
+     the matching block, so it works without JavaScript. -->
+<Base title={t.title} description={t.description} noindex>
+  <section class="section-ph text-center relative overflow-hidden">
+    <HeroDecor id="sub" />
+    <div class="container relative">
+      <h1 class="h2 mb-8">{t.h1}</h1>
+      <div class="sub-states mx-auto max-w-xl">
+        {
+          states.map(([key, s]) => (
+            <div id={key} class="sub-state" role="status">
+              <h2 class="h4">{s.title}</h2>
+              <p class="mt-3">{s.text}</p>
+            </div>
+          ))
+        }
+        <p class="sub-idle">{t.idle}</p>
+      </div>
+      <div class="mt-10 flex justify-center">
+        <a href={t.back.href} class="btn btn-primary">{t.back.label}</a>
+      </div>
+    </div>
+  </section>
+</Base>

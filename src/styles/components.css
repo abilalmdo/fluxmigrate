@@ -205,6 +205,71 @@ a.card-tile:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
+/* custom dropdown (built by main.js over the native select) */
+.fm-select {
+  @apply relative;
+}
+.fm-select-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.fm-select-btn {
+  @apply flex cursor-pointer items-center justify-between gap-3 text-left transition-colors duration-200;
+}
+.fm-select-btn:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 55%, transparent);
+}
+.fm-select-chevron {
+  @apply shrink-0 text-text-dark transition-transform duration-200;
+}
+.fm-select.is-open .fm-select-btn {
+  border-color: var(--color-primary);
+}
+.fm-select.is-open .fm-select-chevron {
+  transform: rotate(180deg);
+  color: var(--color-primary);
+}
+.fm-select-list {
+  @apply absolute inset-x-0 top-full z-30 mt-2 hidden max-h-64 overflow-auto rounded-2xl border border-border bg-light p-1.5 shadow-2xl shadow-black/50 focus:outline-none;
+  backdrop-filter: none;
+}
+.fm-select.is-open .fm-select-list {
+  display: block;
+  animation: fm-select-in 0.16s ease-out;
+}
+.fm-select-opt {
+  @apply flex cursor-pointer items-center justify-between gap-3 rounded-xl px-4 py-2.5 text-text-light transition-colors;
+}
+.fm-select-opt svg {
+  @apply opacity-0 text-primary;
+}
+.fm-select-opt.is-active {
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+.fm-select-opt[aria-selected="true"] {
+  @apply font-medium;
+}
+.fm-select-opt[aria-selected="true"] svg {
+  @apply opacity-100;
+}
+@keyframes fm-select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fm-select.is-open .fm-select-list {
+    animation: none;
+  }
+  .fm-select-chevron {
+    transition: none;
+  }
+}
+
 /* honeypot: reachable to bots, invisible and unfocusable to people */
 .hp-field {
   position: absolute !important;
@@ -224,4 +289,61 @@ a.card-tile:focus-visible {
 .form-error:target,
 .form-error.is-visible {
   @apply block;
+}
+
+/* newsletter opt-in popup (FM-108) */
+.optin {
+  @apply m-auto w-[calc(100%-2rem)] max-w-md rounded-3xl border border-border bg-body p-0 text-text;
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+}
+.optin::backdrop {
+  background: rgb(3 1 14 / 0.75);
+}
+.optin-box {
+  @apply relative p-8;
+}
+.optin-close {
+  @apply absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full text-text hover:bg-white/10;
+}
+.optin-close:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.optin-check {
+  @apply flex items-start gap-3 text-base;
+}
+.optin-check input {
+  @apply mt-1 h-5 w-5 shrink-0 accent-primary;
+}
+/* subscription landing page: the block the URL fragment points at; the idle line when none does */
+.sub-state {
+  @apply hidden rounded-2xl border border-border bg-white/5 px-6 py-6;
+}
+.sub-state:target {
+  @apply block;
+}
+.sub-states:has(.sub-state:target) .sub-idle {
+  @apply hidden;
+}
+
+/* consent banner and settings (FM-705) */
+.consent-banner {
+  @apply fixed bottom-4 left-4 right-4 z-[60] rounded-2xl border border-border bg-body p-6 text-text shadow-2xl;
+  max-width: 34rem;
+}
+.consent-banner[hidden] {
+  display: none;
+}
+.consent-actions {
+  @apply mt-5 flex flex-wrap gap-3;
+}
+.consent-row {
+  @apply flex items-start gap-3 rounded-2xl border border-border bg-white/5 p-4;
+}
+.consent-row input {
+  @apply mt-1 h-5 w-5 shrink-0 accent-primary;
+}
+.consent-prefs {
+  max-width: 34rem;
 }
