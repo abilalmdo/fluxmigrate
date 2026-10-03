@@ -26,7 +26,7 @@ export const consent = {
   close: "Close",
   categories: [
     { key: "necessary", label: "Strictly necessary", text: "Remembers your choices on this page and keeps navigation and forms working. Always on.", locked: true, inUse: true },
-    { key: "functional", label: "Functional", text: "Remembers that you closed the newsletter prompt so it does not return for 30 days.", inUse: true },
+    { key: "functional", label: "Functional", text: "Remembers that you subscribed to our emails so the newsletter prompt does not return.", inUse: true },
     { key: "analytics", label: "Analytics", text: "Would help us understand which pages are useful. Not in use today.", inUse: false },
     { key: "marketing", label: "Marketing", text: "Would be used for advertising and retargeting. Not in use today.", inUse: false },
   ] as ConsentCategory[],
@@ -43,7 +43,7 @@ export const cookiePolicy = {
   summaryTitle: "In short",
   summary: [
     "fluxmigrate.com sets no cookies.",
-    "We store two small items in your browser's local storage: your consent choice and, if you allow it, a note that you closed the newsletter prompt.",
+    "We store two small items in your browser's local storage: your consent choice and, if you allow it, a note that you subscribed to our emails.",
     "We do not run analytics, advertising or tracking tools, and we do not load scripts, fonts or images from other companies.",
   ],
   inventoryTitle: "What is stored today",
@@ -51,7 +51,7 @@ export const cookiePolicy = {
   inventoryHead: ["Name", "Where", "Category", "Purpose", "Kept for"],
   inventory: [
     ["fm-consent", "Local storage", "Strictly necessary", "Remembers your choices on this banner so we do not ask on every page.", "12 months, then we ask again"],
-    ["fm-optin", "Local storage", "Functional", "Remembers that you closed the newsletter prompt so it does not return.", "30 days. Only stored if you allow Functional."],
+    ["fm-optin", "Local storage", "Functional", "Remembers that you subscribed to our emails so the newsletter prompt does not return.", "12 months. Only stored if you allow Functional."],
   ],
   formsTitle: "Forms and your data",
   forms:

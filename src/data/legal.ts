@@ -62,7 +62,7 @@ export const privacyPolicy: LegalDoc = {
       id: "cookies",
       title: "Cookies and browser storage",
       paragraphs: [
-        "This site sets no cookies. It stores two small items in your browser's local storage: your consent choice and, if you allow it, a note that you closed the newsletter prompt. Details, and a way to change your choice, are in our Cookie Policy.",
+        "This site sets no cookies. It stores two small items in your browser's local storage: your consent choice and, if you allow it, a note that you subscribed to our emails. Details, and a way to change your choice, are in our Cookie Policy.",
         "We load no third-party scripts, fonts, trackers, maps or embedded content.",
       ],
     },
@@ -81,7 +81,7 @@ export const privacyPolicy: LegalDoc = {
       id: "newsletter",
       title: "Our email subscription",
       paragraphs: [
-        "When you subscribe, we use double opt-in: we send one email asking you to confirm, and you are subscribed only after you open the link in it. If you do not confirm, you are not added to the list.",
+        "When you subscribe, we use double opt-in: we send one email asking you to confirm, and you are subscribed only after you open the link in it. If you do not confirm, we keep your address marked as unconfirmed, we do not send you newsletters, blog posts or service updates, and we delete it if you ask.",
         "Subscribers receive blog posts, our newsletter and service updates. Every email carries an unsubscribe link, and you can also write to us to be removed. After you unsubscribe we keep your address on a suppression record, marked as unsubscribed, so that we do not email you again unless you choose to subscribe again. You can ask us to delete that record too (see Your rights).",
       ],
     },
@@ -111,9 +111,9 @@ export const privacyPolicy: LegalDoc = {
       title: "How long we keep it",
       list: [
         "Enquiries: for as long as needed to answer you and keep a business record of the relationship, then we delete them.",
-        "Subscriptions: while you are subscribed. After you unsubscribe, the suppression record stays until you ask us to delete it.",
+        "Subscriptions: while you are subscribed. Addresses that were never confirmed stay marked as unconfirmed until you ask us to delete them. After you unsubscribe, the suppression record stays until you ask us to delete it.",
         "Spam-protection records (request counts, repeated-attempt records, short-term duplicate checks): from one hour up to two days.",
-        "Browser storage: as stated in the Cookie Policy (12 months for the consent choice, 30 days for the newsletter prompt).",
+        "Browser storage: as stated in the Cookie Policy (12 months for the consent choice, 12 months for the note that you subscribed).",
       ],
     },
     {

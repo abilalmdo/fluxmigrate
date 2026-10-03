@@ -289,9 +289,8 @@ popup --fetch--> subscribe.php --> subscribers.sqlite (status: pending) --SMTP--
   prefer exporting confirmed rows to a sending service.
 - **Protection:** same layers as the contact form (captcha, honeypot, fill time, Origin check, strikes and lockout), plus 5 sign-ups per IP and
   100 overall per hour. The reply never says whether an address is already on the list.
-- **Popup behaviour:** opens after 25 s or 40% scroll, once per 30 days (remembered in `localStorage` key `fm-optin`, only with the visitor's
-  functional-storage consent, see the consent banner), never on contact, thank-you, subscription and 404 pages (`popup` prop of `Base.astro`).
-  Any element with `data-optin-open` reopens it.
+- **Popup behaviour:** opens after 25 s or 40% scroll, once per page view, on every page until the visitor subscribes (closing it hides it only for that page); subscribing is remembered for 12 months in `localStorage` key `fm-optin`, only with the visitor's functional-storage consent (see the consent banner), so a visitor who rejected Functional never sees it. It waits until the consent choice is made. Never on contact, thank-you, subscription and 404 pages (`popup` prop of `Base.astro`). Any element with `data-optin-open` reopens it.
+- **Unconfirmed addresses:** saved at once as `pending`, and the team gets a "New sign-up (not yet confirmed)" mail; the confirmation mail follows. Never send newsletters to them: mailing list = `status = 'confirmed'`.
 - **Config:** optional secrets `DATA_DIR` and `SITE_URL` (link base in mails; default `https://www.fluxmigrate.com`), written into
   `mail-config.php` by `tools/write-mail-config.mjs`. Needs PHP's `pdo_sqlite` (normally on).
 - **Local test:** `bash tools/form-test/run.sh` (phases `sub-main`, `sub-abuse`, `sub-rate`); for a browser, `PORT=8090 bash tools/form-test/preview.sh`

@@ -32,7 +32,11 @@ if (phase === "sub-main") {
   let j = await r.json();
   ok(r.status === 200 && j.ok === true && j.redirect === "/subscription.html#pending", "valid sign-up -> ok, redirect to /subscription.html#pending", JSON.stringify(j));
   let mails = sink().slice(before);
-  ok(mails.length === 1 && /ada@example\.com/.test(mails[0].to.join()), "one confirmation mail, addressed to the visitor", JSON.stringify(mails.map((m) => m.to)));
+  ok(mails.length === 2, "a sign-up sends two mails: a notice to the team and the confirmation", JSON.stringify(mails.map((m) => m.to)));
+  ok(/info@fluxmigrate\.com/.test(mails[0].to.join()) && /New sign-up \(not yet confirmed\): ada@example\.com/.test(mails[0].data) && /Do not send newsletters to it until its status is 'confirmed'/.test(mails[0].data),
+     "team notice arrives at sign-up, before any confirmation, and says the address is unconfirmed");
+  ok(/ada@example\.com/.test(mails[1].to.join()) && /Confirm your FluxMigrate subscription/.test(mails[1].data), "confirmation mail is addressed to the visitor");
+  mails = [mails[1]]; // the rest of this block looks at the confirmation
   const lk = links(mails[0]);
   ok(!!lk.confirm && !!lk.unsub, "mail carries a confirm link and an unsubscribe link");
   ok(/http:\/\/127\.0\.0\.1:8089\/subscribe-confirm\.php/.test(mails[0].data), "links use the configured site URL (not the request's Host)");
@@ -47,7 +51,7 @@ if (phase === "sub-main") {
   // 2 - same address again while pending: thanked, not mailed again
   r = await post(form());
   j = await r.json();
-  ok(j.ok === true && sink().length === before + 1 && rows().length === 1, "same address again within a day: looks successful, no second mail, no second row");
+  ok(j.ok === true && sink().length === before + 2 && rows().length === 1, "same address again within a day: looks successful, no second mail, no second row");
   r = await post(form({ email: "ADA@Example.com" }));
   ok((await r.json()).ok === true && rows().length === 1, "same address in other case does not create a second row");
 
@@ -57,13 +61,13 @@ if (phase === "sub-main") {
   db = rows();
   ok(db[0].status === "confirmed" && !!db[0].confirmed_at, "row is confirmed with a timestamp");
   mails = sink().slice(before);
-  ok(mails.length === 2 && /info@fluxmigrate\.com/.test(mails[1].to.join()) && /ada@example\.com/.test(mails[1].data) && /Subscribed to: Blog posts, Newsletter, Service updates/.test(mails[1].data), "team inbox gets a notice with the address and what they subscribed to");
+  ok(mails.length === 3 && /info@fluxmigrate\.com/.test(mails[2].to.join()) && /New subscriber: ada@example\.com/.test(mails[2].data) && /Subscribed to: Blog posts, Newsletter, Service updates/.test(mails[2].data), "team inbox gets a notice with the address and what they subscribed to");
   r = await get(`/subscribe-confirm.php?t=${lk.confirm}`);
-  ok(loc(r) === "/subscription.html#confirmed" && sink().length === before + 2, "clicking the link twice is harmless and sends no second notice");
+  ok(loc(r) === "/subscription.html#confirmed" && sink().length === before + 3, "clicking the link twice is harmless and sends no second notice");
 
   // 4 - already confirmed: sign-up again says nothing new and mails nothing
   r = await post(form());
-  ok((await r.json()).ok === true && sink().length === before + 2, "sign-up for a confirmed address: looks the same, sends nothing (no way to probe the list)");
+  ok((await r.json()).ok === true && sink().length === before + 3, "sign-up for a confirmed address: looks the same, sends nothing (no way to probe the list)");
 
   // 5 - bad links
   for (const t of ["zz", "", "../../etc/passwd", "0".repeat(32), "a".repeat(33)]) {
@@ -86,8 +90,8 @@ if (phase === "sub-main") {
   // 7 - coming back: pending again, new tokens, new mail
   const b7 = sink().length;
   r = await post(form());
-  ok((await r.json()).ok === true && sink().length === b7 + 1, "re-subscribing after unsubscribe sends a fresh confirmation");
-  const lk2 = links(sink()[b7]);
+  ok((await r.json()).ok === true && sink().length === b7 + 2, "re-subscribing after unsubscribe sends a notice and a fresh confirmation");
+  const lk2 = links(sink()[b7 + 1]);
   db = rows();
   ok(db.length === 1 && db[0].status === "pending" && lk2.confirm !== lk.confirm && lk2.unsub !== lk.unsub, "same row reused, pending, new tokens");
   r = await get(`/subscribe-confirm.php?t=${lk.confirm}`);

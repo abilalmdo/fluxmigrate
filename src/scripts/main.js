@@ -339,13 +339,14 @@
     }
 
     // --- newsletter opt-in popup (FM-108) ------------------------------------------------
-    // Opens once per visitor per 30 days: after 25 s on the page or once 40% has been scrolled,
-    // whichever comes first. Closing it (button, Escape, click outside) or subscribing silences it.
+    // Opens on every page until the visitor has subscribed: after 25 s or once 40% has been scrolled,
+    // whichever comes first, once per page view. Closing it (button, Escape, click outside) hides it for
+    // that page only; the next page shows it again. Subscribing silences it for 12 months.
     // Anything with data-optin-open reopens it on request. Without <dialog> support nothing happens.
     const optin = document.getElementById("optin");
     if (optin && typeof optin.showModal === "function") {
       const KEY = "fm-optin";
-      const MUTE_MS = 30 * 24 * 3600 * 1000;
+      const MUTE_MS = 365 * 24 * 3600 * 1000;
       const muted = () => {
         try {
           const t = Number(localStorage.getItem(KEY));
@@ -354,7 +355,7 @@
           return false;
         }
       };
-      // remembering the dismissal is Functional storage: only with consent (consent.js, FM-705)
+      // remembering that they subscribed is Functional storage: only with consent (consent.js, FM-705)
       const allowed = () => !!(window.fmConsent && window.fmConsent.has("functional"));
       const mute = () => {
         if (!allowed()) return;
@@ -379,13 +380,15 @@
         const first = optin.querySelector("input[type=email]");
         if (first) first.focus();
       };
+      let shown = false; // once per page view, so closing it does not bring it straight back
       const auto = () => {
-        if (optin.open) return;
+        if (optin.open || shown) return;
         if (!window.fmConsent || !window.fmConsent.get()) return void setTimeout(auto, 8000); // not before the consent choice
         if (!allowed() || muted()) return;
         const busy = document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
         const menuOpen = toggle && toggle.getAttribute("aria-expanded") === "true";
         if (busy || menuOpen) return void setTimeout(auto, 8000); // not while they are typing or navigating
+        shown = true;
         open();
       };
       const timer = setTimeout(auto, 25000);
@@ -398,7 +401,6 @@
         }
       };
       window.addEventListener("scroll", onScroll, { passive: true });
-      optin.addEventListener("close", mute);
       optin.addEventListener("click", (e) => {
         if (e.target === optin) optin.close(); // click on the backdrop
       });

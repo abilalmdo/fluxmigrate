@@ -141,6 +141,7 @@ if ($db === null) {
 }
 
 $sendConfirmation = false;
+$isNewSignup = false;   // true for a first sign-up and for a return after unsubscribing, false for a repeat while pending
 try {
     $stmt = $db->prepare('SELECT * FROM subscribers WHERE email = ?');
     $stmt->execute(array($email));
@@ -153,6 +154,7 @@ try {
                       VALUES (?, ?, \'pending\', ?, ?, ?, ?, ?, ?)')
            ->execute(array($email, $interests, FM_CONSENT_TEXT, $sourcePage, $ipHash, fm_new_token(), fm_new_token(), $now));
         $sendConfirmation = true;
+        $isNewSignup = true;
     } elseif ($row['status'] === 'unsubscribed') {
         // Came back: a fresh confirmation, fresh tokens, fresh consent record.
         $db->prepare('UPDATE subscribers SET status = \'pending\', interests = ?, consent_text = ?, source_page = ?, ip_hash = ?,
@@ -160,6 +162,7 @@ try {
                       WHERE id = ?')
            ->execute(array($interests, FM_CONSENT_TEXT, $sourcePage, $ipHash, fm_new_token(), fm_new_token(), $now, $row['id']));
         $sendConfirmation = true;
+        $isNewSignup = true;
     } elseif ($row['status'] === 'pending') {
         // Still waiting for the click: mail again, but not more than once a day.
         $last = $row['confirm_sent_at'] ? strtotime($row['confirm_sent_at'] . ' UTC') : 0;
@@ -170,6 +173,19 @@ try {
     if ($sendConfirmation) {
         $stmt->execute(array($email));
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        // The address is saved from this moment, confirmed or not. Tell the team now, so it is in the inbox
+        // even if the visitor never opens the confirmation link. Best effort. Unconfirmed addresses must not be
+        // sent newsletters; only rows with status 'confirmed' may be.
+        if ($isNewSignup) {
+            fm_send_mail(
+                $config,
+                $config['to'],
+                'New sign-up (not yet confirmed): ' . $email,
+                "A visitor signed up for FluxMigrate emails and has not confirmed yet.\n\nEmail: $email\nWill receive, once confirmed: " . fm_interest_labels($row['interests'])
+                . "\nPage: " . ($sourcePage !== '' ? $sourcePage : '(unknown)') . "\nSigned up: " . fm_now() . " UTC\n\n"
+                . "The address is saved. Do not send newsletters to it until its status is 'confirmed' (you will get a second notice).\n"
+            );
+        }
         $base = fm_site_url($config);
         $body = "Please confirm your subscription to FluxMigrate emails.\n\n"
             . "Confirm: $base/subscribe-confirm.php?t=" . $row['confirm_token'] . "\n\n"
