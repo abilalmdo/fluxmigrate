@@ -24,6 +24,7 @@ const FM_CONTACT_URL = '/contact.html';
 const FM_MIN_FILL_MS = 2500;   // a person needs longer than this to fill the form
 const FM_IP_LIMIT = 5;         // submissions per IP per hour
 const FM_GLOBAL_LIMIT = 60;    // submissions from everyone per hour
+const FM_MAX_BODY = 65536;     // bytes; the longest legitimate enquiry is about 6 KB
 
 $wantsJson = isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false;
 
@@ -33,6 +34,9 @@ function fm_finish($ok, $code, $status = 200)
     $messages = array(
         'invalid' => 'Please fill in your name, company and a valid email address.',
         'rate' => 'Too many messages from your connection. Please try again later, or email info@fluxmigrate.com.',
+        'captcha' => 'That answer was not right. Please answer the new question and try again.',
+        'expired' => 'The security question expired. Please answer the new question and try again.',
+        'spam' => 'Your message looks like it contains links or promotional content. Please remove them and try again, or email info@fluxmigrate.com.',
         'send' => "We couldn't send your message just now. Please try again in a few minutes, or email info@fluxmigrate.com.",
     );
     header('Cache-Control: no-store');
@@ -42,6 +46,7 @@ function fm_finish($ok, $code, $status = 200)
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(array(
             'ok' => $ok,
+            'code' => $ok ? 'ok' : $code,
             'redirect' => $ok ? FM_THANKS_URL : null,
             'message' => $ok ? null : (isset($messages[$code]) ? $messages[$code] : $messages['send']),
         ));
@@ -60,37 +65,6 @@ function fm_field($key, $max, $multiline = false)
     return mb_strlen($v, 'UTF-8') > $max ? false : $v;   // false = too long
 }
 
-/** Sliding-window counter in the system temp dir (outside the web root). True = over the limit. */
-function fm_over_limit($key, $limit, $window)
-{
-    $file = sys_get_temp_dir() . '/fm-form-' . $key;
-    $fh = @fopen($file, 'c+');
-    if (!$fh) {
-        return false;   // never lose an enquiry because the temp dir is unwritable
-    }
-    flock($fh, LOCK_EX);
-    $now = time();
-    $hits = array();
-    $raw = stream_get_contents($fh);
-    if ($raw) {
-        foreach (explode(',', $raw) as $t) {
-            if ((int) $t > $now - $window) {
-                $hits[] = (int) $t;
-            }
-        }
-    }
-    $over = count($hits) >= $limit;
-    if (!$over) {
-        $hits[] = $now;
-    }
-    ftruncate($fh, 0);
-    rewind($fh);
-    fwrite($fh, implode(',', $hits));
-    flock($fh, LOCK_UN);
-    fclose($fh);
-    return $over;
-}
-
 // --- request checks --------------------------------------------------------------------------
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
@@ -101,11 +75,25 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     exit;
 }
 
+require __DIR__ . '/_form/guard.php';
+
 $configFile = __DIR__ . '/mail-config.php';
 $config = is_file($configFile) ? require $configFile : null;
 if (!is_array($config) || empty($config['host']) || empty($config['user']) || empty($config['password']) || empty($config['to'])) {
     error_log('[contact-submit] mail-config.php is missing or incomplete');
     fm_finish(false, 'send', 500);
+}
+
+fm_cleanup();
+$client = fm_client_key($config);
+
+// A client with three strikes in the last hour is locked out until the oldest one ages away.
+if (fm_is_locked_out($client)) {
+    fm_finish(false, 'rate', 429);
+}
+if ((int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > FM_MAX_BODY) {
+    fm_strike($client);
+    fm_finish(false, 'invalid', 413);
 }
 
 // Browsers send Origin (or Referer) on a form post; refuse one that names another site.
@@ -114,13 +102,15 @@ $allowedHosts = isset($config['allowed_hosts']) && is_array($config['allowed_hos
     : array('fluxmigrate.com', 'www.fluxmigrate.com');
 $from = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
 if ($from !== '' && !in_array(strtolower((string) parse_url($from, PHP_URL_HOST)), $allowedHosts, true)) {
+    fm_strike($client);
     fm_finish(false, 'send', 403);
 }
 
 // Bots: a filled honeypot, or a form submitted faster than a person could fill it. Answer as if it
-// worked so the bot learns nothing, and send nothing.
+// worked so the bot learns nothing, send nothing, and count a strike.
 $filledMs = isset($_POST['ts']) && ctype_digit((string) $_POST['ts']) ? (int) round(microtime(true) * 1000) - (int) $_POST['ts'] : null;
 if ((isset($_POST['hp_url']) && $_POST['hp_url'] !== '') || ($filledMs !== null && $filledMs < FM_MIN_FILL_MS)) {
+    fm_strike($client);
     fm_finish(true, 'ok');
 }
 
@@ -145,10 +135,40 @@ if ($name === '' || $company === '' || !filter_var($email, FILTER_VALIDATE_EMAIL
     fm_finish(false, 'invalid', 422);
 }
 
+// --- captcha ---------------------------------------------------------------------------------
+// Checked after validation so a typo in the email does not cost the visitor their answer.
+
+$captcha = fm_captcha_check($config, isset($_POST['captcha_token']) ? $_POST['captcha_token'] : null, isset($_POST['captcha']) ? $_POST['captcha'] : null);
+if ($captcha === 'expired') {
+    fm_finish(false, 'expired', 422);
+}
+if ($captcha === 'missing') {
+    fm_finish(false, 'captcha', 422);   // no JavaScript, or a script that never asked: no strike
+}
+if ($captcha === 'fast') {
+    fm_strike($client);
+    fm_finish(true, 'ok');
+}
+if ($captcha !== 'ok') {
+    fm_strike($client);
+    fm_finish(false, 'captcha', 422);
+}
+
+// --- content ---------------------------------------------------------------------------------
+
+if (fm_looks_like_spam(array($name, $company, $role, $need, $env, $count, $engagement), $details)) {
+    fm_strike($client);
+    fm_finish(false, 'spam', 422);
+}
+// The same enquiry again within a day (double click, retry, replayed script): thank the sender, send nothing.
+$duplicate = fm_duplicate_key($email, $name, $company, $details);
+if (fm_window($duplicate, FM_DUPLICATE_WINDOW, 1, false)) {
+    fm_finish(true, 'ok');
+}
+
 // --- rate limit ------------------------------------------------------------------------------
 
-$ipKey = hash_hmac('sha256', isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '', (string) $config['password']);
-if (fm_over_limit('ip-' . substr($ipKey, 0, 32), FM_IP_LIMIT, 3600) || fm_over_limit('all', FM_GLOBAL_LIMIT, 3600)) {
+if (fm_window('ip-' . $client, 3600, FM_IP_LIMIT, true) || fm_window('all', 3600, FM_GLOBAL_LIMIT, true)) {
     fm_finish(false, 'rate', 429);
 }
 
@@ -219,4 +239,5 @@ try {
     }
 }
 
+fm_window($duplicate, FM_DUPLICATE_WINDOW, 1, true);   // remembered only once the mail is out
 fm_finish(true, 'ok');

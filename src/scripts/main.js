@@ -130,10 +130,41 @@
         status.focus({ preventScroll: true });
       };
 
+      // Self-hosted captcha: ask the server for a question; the signed token comes back with it.
+      const captchaBox = document.getElementById("captcha-field");
+      const captchaLabel = document.getElementById("captcha-label");
+      const captchaInput = document.getElementById("captcha");
+      const captchaToken = form.elements.namedItem("captcha_token");
+      const loadCaptcha = async () => {
+        if (!captchaBox || !window.fetch) return false;
+        try {
+          const res = await fetch("/contact-captcha.php", { headers: { Accept: "application/json" }, cache: "no-store" });
+          const data = await res.json();
+          if (!res.ok || !data.question || !data.token) return false;
+          captchaLabel.textContent = data.question;
+          captchaToken.value = data.token;
+          captchaInput.value = "";
+          captchaInput.required = true;
+          captchaBox.hidden = false;
+          return true;
+        } catch {
+          return false;
+        }
+      };
+      loadCaptcha();
+
       form.addEventListener("submit", async (e) => {
         if (!window.fetch) return; // plain post
         e.preventDefault();
         status.classList.remove("is-visible");
+        if (!captchaToken.value && !(await loadCaptcha())) {
+          showError("The security check could not load. Please try again in a moment, or email us.");
+          return;
+        }
+        if (!captchaInput.value.trim()) {
+          captchaInput.focus();
+          return;
+        }
         if (button) {
           button.disabled = true;
           button.textContent = "Sending…";
@@ -150,8 +181,16 @@
             return;
           }
           showError(data.message);
+          if (data.code !== "invalid") {
+            // The server spends a token on every attempt that got past validation, so ask for a fresh question
+            captchaToken.value = "";
+            await loadCaptcha();
+            if (data.code === "captcha" || data.code === "expired") captchaInput.focus();
+          }
         } catch {
           showError();
+          captchaToken.value = "";
+          await loadCaptcha();
         }
         if (button) {
           button.disabled = false;

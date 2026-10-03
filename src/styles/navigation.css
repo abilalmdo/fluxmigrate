@@ -65,3 +65,15 @@
 .nav-dropdown-link.active {
   @apply text-primary;
 }
+
+/* nine items: at 1280-1365 px the logo, the pill and the CTA need a tighter pill to share one row (FM-515, FM-704) */
+@media (min-width: 1280px) and (max-width: 1365px) {
+  .navbar-nav {
+    padding-inline: 1rem;
+    column-gap: 0;
+  }
+  .navbar-nav .nav-link {
+    padding-inline: 0.375rem;
+    font-size: 0.9375rem;
+  }
+}

@@ -60,8 +60,10 @@ jobs:
           # PHP must execute: a GET is refused with 405. A host that prints the source would answer 200.
           for i in 1 2 3; do c=$(code contact-submit.php); [ "$c" = 405 ] && break; sleep 10; done
           [ "$c" = 405 ] || { echo "::error::contact-submit.php answered HTTP $c, expected 405 (is PHP enabled on the host?)"; exit 1; }
+          # the captcha endpoint must issue a question (proves PHP, the config and the guard library all load)
+          curl -s "$base/contact-captcha.php" | grep -q '"question"' || { echo "::error::contact-captcha.php did not return a question"; exit 1; }
           # the credentials, the deploy state and the mail library must not be served
-          for p in mail-config.php .ftp-deploy-sync-state.json _form/phpmailer/PHPMailer.php; do
+          for p in mail-config.php .ftp-deploy-sync-state.json _form/phpmailer/PHPMailer.php _form/guard.php; do
             c=$(code "$p")
             case "$c" in 403|404) ;; *) echo "::error::$p is publicly readable (HTTP $c)"; exit 1 ;; esac
           done

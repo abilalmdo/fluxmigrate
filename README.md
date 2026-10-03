@@ -90,7 +90,7 @@ The site was static HTML with `.html` URLs, and search engines have indexed them
 configured with `build.format: "file"`, so every page keeps its address:
 
 `/`, `/about.html`, `/contact.html`, `/technology.html`, `/industries.html`,
-`/contact-us.html`, `/cloud-migration.html`, `/devops-platform-engineering.html`,
+`/contact-us.html`, `/aiops-services.html`, `/cloud-migration.html`, `/devops-platform-engineering.html`,
 `/sre-reliability-engineering.html`, `/vmware-modernization.html`, `/staff-augmentation.html`,
 `/404.html`, `/thank-you.html` (noindex, not in the sitemap). Canonicals, `og:url`, the sitemap and every internal link use that `.html` form.
 
@@ -104,6 +104,7 @@ configured with `build.format: "file"`, so every page keeps its address:
 | Header nav, Services dropdown, footer columns | `src/config/menu.json` |
 | Site title, URL, footer tagline, email, contact-form endpoint | `src/config/config.json` |
 | Phone number, opening hours, office addresses | `params.phone`, `params.offices` in `src/config/config.json`. The phone shows in the footer, contact page, mobile menu and thank-you page; the addresses show on `/contact.html` and `/contact-us.html` only (not the footer); JSON-LD reads both |
+| AIOps page and home AIOps section (tracks, services, scenarios) | `src/data/aiops.ts` (tracks, services) and `src/data/aiops-detail.ts` (per-service capabilities and scenarios, track pages); art in `tools/images/scenes/aiops.mjs` |
 | "Contact Us" page wording | `contactUsPage` in `src/data/content.ts` (footer link: `menu.json` → `footer_company`) |
 | Thank-you page wording | `thankYouPage` in `src/data/content.ts` |
 | Who receives enquiries, SMTP host/user | GitHub secrets (see "Contact form"), not a file in the repo |
@@ -219,10 +220,23 @@ contact.html --fetch--> contact-submit.php --SMTP--> mailbox (forms@) --> info@f
 - **Delivery:** PHPMailer (`public/_form/phpmailer/`, LGPL-2.1, see `THIRD-PARTY-NOTICES.md`) over
   authenticated SMTP. If SMTP fails (some shared hosts block outbound ports) it falls back to the host's
   own `mail()`, which SPF and DKIM already cover. `Reply-To` is the visitor, so replying answers them.
-- **Abuse controls:** honeypot (`hp_url`), a minimum fill time (the script stamps `ts`; under 2.5 s is
-  refused), a same-site `Origin` check, per-IP (5/h) and global (60/h) rate limits kept in the system
-  temp dir, length limits, and CR/LF stripped from every header value. Bots that trip the honeypot or the
-  timer are told "success" and nothing is sent. No captcha, no third-party script.
+- **Abuse controls (FM-107):** layered, all in `public/contact-submit.php`, `contact-captcha.php` and `_form/guard.php`.
+  1. **Self-hosted captcha.** The page asks `/contact-captcha.php` for a question ("What is 7 plus 5?", "Type the last three letters
+     of the word ..."). The token is signed, the answer is never stored, a token works once and lives 30 minutes, and an answer
+     faster than 3 s is treated as a script. Digits or words are both accepted. To add or change question types edit
+     `fm_captcha_new()` and the `solve()` helper in `tools/form-test/check-endpoint.mjs`.
+  2. **Honeypot** (`hp_url`), **minimum fill time** (`ts`, under 2.5 s), **same-site `Origin` check**, 64 KB body cap.
+  3. **Strikes and lockout.** Honeypot, script-speed answers, wrong or reused captcha, foreign Origin, spam content and oversize
+     bodies each count a strike; three in an hour lock the client out (HTTP 429) until the oldest strike ages away. Bots that trip the
+     honeypot or the timer are told "success" and nothing is sent.
+  4. **Content filter.** A link in a short field, more than two links in the message, HTML tags, or a few spam trades are refused
+     with a visible message (so a false positive is not silent).
+  5. **Duplicates.** The same email, name, company and message within 24 h is thanked but not sent twice.
+  6. **Rate limits.** 5 enquiries per IP per hour, 60 overall, 30 captcha questions per IP per hour; length limits; CR/LF stripped
+     from every header value. Counters live in the system temp dir (client IPs only as a keyed hash).
+  No third-party script or service is involved. A JavaScript-off visitor cannot pass the captcha; the page tells them to email.
+  The limits are per `REMOTE_ADDR`: if a CDN or proxy is ever put in front of the site, add trusted `X-Forwarded-For` handling
+  in `fm_client_key()` or every visitor will share one counter.
 - **Secrets:** the SMTP credentials exist only as **GitHub Actions secrets** `SMTP_HOST`, `SMTP_USER`,
   `SMTP_PASSWORD` (optional: `SMTP_PORT` = 465, `SMTP_SECURE` = `ssl` or `tls`, `MAIL_TO` =
   info@fluxmigrate.com, `MAIL_FROM` = `SMTP_USER`). On each deploy `tools/write-mail-config.mjs` writes

@@ -5,6 +5,7 @@
       "url": "#",
       "hasChildren": true,
       "children": [
+        { "name": "AIOps Services", "url": "/aiops-services.html" },
         { "name": "DevSecOps", "url": "/#service-devsecops" },
         { "name": "Cloud & Migration", "url": "/cloud-migration.html" },
         { "name": "DevOps & Platform", "url": "/devops-platform-engineering.html" },
@@ -19,6 +20,7 @@
     { "name": "Staff Augmentation", "url": "/staff-augmentation.html" },
     { "name": "DevOps", "url": "/devops-platform-engineering.html" },
     { "name": "SRE", "url": "/sre-reliability-engineering.html" },
+    { "name": "AIOps", "url": "/aiops-services.html" },
     { "name": "VMware", "url": "/vmware-modernization.html" },
     { "name": "Technology", "url": "/technology.html" },
     { "name": "Industries", "url": "/industries.html" },
@@ -31,9 +33,9 @@
   "footer_services": [
     { "name": "IT Managed Services", "url": "/sre-reliability-engineering.html" },
     { "name": "Cybersecurity", "url": "/#service-devsecops" },
-    { "name": "GRC & Compliance", "url": "/contact.html" },
+    { "name": "GRC & Compliance", "url": "/aiops-grc.html" },
     { "name": "Automation", "url": "/devops-platform-engineering.html" },
-    { "name": "Agentic AI", "url": "/contact.html" }
+    { "name": "Agentic AI", "url": "/aiops-mlops.html" }
   ],
   "footer_company": [
     { "name": "Staff Augmentation", "url": "/staff-augmentation.html" },

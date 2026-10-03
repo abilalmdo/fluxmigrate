@@ -12,6 +12,8 @@ const SITE = "https://www.fluxmigrate.com";
 const EXPECTED = [
   "index", "about", "contact", "contact-us", "technology", "industries", "cloud-migration",
   "devops-platform-engineering", "sre-reliability-engineering", "vmware-modernization", "staff-augmentation",
+  "aiops-services", "aiops-sre", "aiops-security", "aiops-grc", "aiops-network", "aiops-cloud", "aiops-finops",
+  "aiops-devsecops", "aiops-mlops",
 ];
 
 let failures = 0;
@@ -111,8 +113,11 @@ for (const [file, src] of Object.entries(html)) {
 }
 
 // contact form back end (task FM-106): the endpoint, its library and the rules that protect the config
-for (const f of ["contact-submit.php", "_form/.htaccess", "_form/phpmailer/PHPMailer.php", "_form/phpmailer/SMTP.php", "_form/phpmailer/Exception.php"]) {
+for (const f of ["contact-submit.php", "contact-captcha.php", "_form/guard.php", "_form/.htaccess", "_form/phpmailer/PHPMailer.php", "_form/phpmailer/SMTP.php", "_form/phpmailer/Exception.php"]) {
   if (!existsSync(join(dist, f))) fail("contact-form", `${f} missing from dist`);
+}
+for (const needle of ['id="captcha-field"', 'name="captcha_token"', 'name="captcha"', 'name="hp_url"']) {
+  if (!(html["contact.html"] || "").includes(needle)) fail("contact.html", `form lacks ${needle} (spam protection, FM-107)`);
 }
 if (!/action="\/contact-submit\.php"/.test(html["contact.html"] || "")) fail("contact.html", "form does not post to /contact-submit.php");
 const ht = existsSync(join(dist, ".htaccess")) ? readFileSync(join(dist, ".htaccess"), "utf8") : "";

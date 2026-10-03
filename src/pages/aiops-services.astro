@@ -1,0 +1,158 @@
+---
+import AiopsTrackCards from "@/components/AiopsTrackCards.astro";
+import CtaBand from "@/components/CtaBand.astro";
+import GradientBlob from "@/components/GradientBlob.astro";
+import Icon from "@/components/Icon.astro";
+import PageHero from "@/components/PageHero.astro";
+import SectionIntro from "@/components/SectionIntro.astro";
+import { aiops } from "@/data/aiops";
+import Base from "@/layouts/Base.astro";
+import { breadcrumbSchema, canonicalFor, serviceSchema } from "@/lib/site";
+
+const canonical = canonicalFor(`/${aiops.slug}`);
+const schema = [
+  breadcrumbSchema(aiops.navLabel, canonical),
+  serviceSchema("AIOps Services", canonical, aiops.description),
+];
+---
+
+<Base title={aiops.title} description={aiops.description} schema={schema}>
+  <PageHero
+    h1={aiops.h1}
+    subtitle={aiops.subtitle}
+    cta={aiops.cta}
+    image={{ src: aiops.heroImage, alt: aiops.heroAlt }}
+  />
+
+  <!-- Track index -->
+  <section class="section relative">
+    <div class="container">
+      <div class="section-container">
+        <SectionIntro title={aiops.tracksTitle} text={aiops.tracksText} />
+        <div class="section-content">
+          <AiopsTrackCards />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Closed loop -->
+  <section class="section relative overflow-hidden">
+    <div class="container">
+      <div class="section-container">
+        <SectionIntro title={aiops.loop.title} text={aiops.loop.intro} />
+        <div class="section-content">
+          <ol class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {
+              aiops.loop.items.map((step, n) => (
+                <li class="card-tile relative overflow-hidden">
+                  <span class="t-stroke block leading-none font-extrabold text-transparent text-[4.5rem]" aria-hidden="true">
+                    {String(n + 1).padStart(2, "0")}
+                  </span>
+                  <h3 class="text-h5-sm font-bold mt-2">{step.title}</h3>
+                  <p class="mt-3 text-text-dark">{step.text}</p>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
+    </div>
+    <GradientBlob />
+  </section>
+
+  <!-- Guardrails -->
+  <section class="section relative">
+    <div class="container">
+      <div class="section-container">
+        <SectionIntro title={aiops.guardrailsTitle} />
+        <div class="section-content">
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {
+              aiops.guardrails.map((item) => (
+                <article class="card-tile">
+                  <Icon name={item.icon} size={56} class="mb-6" />
+                  <h3 class="text-h5-sm font-bold">{item.title}</h3>
+                  <p class="mt-3 text-text-dark">{item.text}</p>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The eight tracks -->
+  {
+    aiops.tracks.map((track, i) => (
+      <section id={`track-${track.id}`} class="section relative overflow-hidden scroll-mt-24">
+        <div class="container">
+          <div class="flex items-center gap-5 mb-8">
+            <Icon name={track.icon} size={64} />
+            <div>
+              <p class="text-sm tracking-wider uppercase text-primary font-semibold mb-1" aria-hidden="true">
+                Track {String(i + 1).padStart(2, "0")}
+              </p>
+              <h2 class="text-h3-sm lg:text-h3 font-bold">{track.name}</h2>
+            </div>
+          </div>
+          <p class="text-lg lg:text-xl max-w-4xl mb-10">{track.tagline}</p>
+          <div class="relative w-full max-w-6xl mx-auto rounded-4xl corner-squircle border border-white/15 bg-light/50 p-2 md:p-3 shadow-[0_0_100px_-35px_var(--color-primary)]">
+            <img
+              src={track.image}
+              alt={track.imageAlt}
+              width={1600}
+              height={900}
+              loading="lazy"
+              decoding="async"
+              class="w-full h-auto rounded-3xl corner-squircle"
+            />
+          </div>
+          <p class="mt-8">
+            <a class="btn btn-outline" href={`/aiops-${track.id}.html`}>
+              Explore {track.name}
+            </a>
+          </p>
+          <ul class="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {track.services.map((s) => (
+              <li class="card-tile">
+                <h3 class="text-h6-sm font-bold text-white">{s.name}</h3>
+                <p class="mt-2 text-text-dark">{s.text}</p>
+              </li>
+            ))}
+            <li class="rounded-2xl border border-dashed border-primary/50 p-6 flex flex-col justify-center">
+              <p class="text-sm tracking-wider uppercase text-primary font-semibold mb-2">{aiops.scenarioLabel}</p>
+              <p class="text-text-dark">{track.scenario}</p>
+            </li>
+          </ul>
+        </div>
+        {i % 2 === 0 && <GradientBlob />}
+      </section>
+    ))
+  }
+
+  <!-- Delivery -->
+  <section class="section relative">
+    <div class="container">
+      <div class="section-container">
+        <SectionIntro title={aiops.deliverTitle} text={aiops.deliverIntro} />
+        <div class="section-content">
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {
+              aiops.deliver.map((item) => (
+                <article class="card-tile">
+                  <Icon name={item.icon} size={56} class="mb-6" />
+                  <h3 class="text-h5-sm font-bold">{item.title}</h3>
+                  <p class="mt-3 text-text-dark">{item.text}</p>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title={aiops.closing.title} text={aiops.closing.text} button={aiops.closing.cta} />
+</Base>

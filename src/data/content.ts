@@ -92,6 +92,7 @@ export const home = {
       { id: "service-finops", icon: "finops", title: "FinOps Consulting", text: "Cost visibility, rightsizing and commitment planning that turn cloud spend into a governed, forecastable line item.", href: "/contact.html", label: "Talk to a specialist" },
       { id: "service-well-architected", icon: "wellarch", title: "Well-Architected Review", text: "A structured audit against the AWS and Azure Well-Architected pillars, with a prioritized remediation roadmap.", href: "/contact.html", label: "Talk to a specialist" },
       { id: "service-vmware", icon: "vmware", title: "VMware Modernization", text: "A structured exit path off VMware — target platform selection, workload migration and cutover, without unplanned downtime.", href: "/vmware-modernization.html", label: "Discover more" },
+      { id: "service-aiops", icon: "aiops", wide: true, title: "AIOps Services", text: "Eight AIOps tracks (SRE, Cybersecurity, GRC, Network, CloudOps, FinOps, DevSecOps, MLOps and LLMOps) that turn signals into policy-controlled, verified and audited action.", href: "/aiops-services.html", label: "Explore AIOps Services" },
     ],
   },
   cta: {
@@ -427,6 +428,7 @@ export const notFound = {
   title: "Page not found | FluxMigrate",
   links: [
     { title: "Services", items: [
+      { name: "AIOps Services", href: "/aiops-services.html" },
       { name: "Cloud & Migration", href: "/cloud-migration.html" },
       { name: "DevOps & Platform", href: "/devops-platform-engineering.html" },
       { name: "SRE & Reliability", href: "/sre-reliability-engineering.html" },

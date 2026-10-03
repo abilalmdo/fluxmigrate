@@ -61,13 +61,14 @@ export const websiteSchema = {
   publisher: { "@id": ORG_ID },
 };
 
-export function breadcrumbSchema(label: string, canonical: string) {
+export function breadcrumbSchema(label: string, canonical: string, parents: { name: string; url: string }[] = []) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: `${config.site.base_url}/` },
-      { "@type": "ListItem", position: 2, name: label, item: canonical },
+      ...parents.map((p, i) => ({ "@type": "ListItem", position: i + 2, name: p.name, item: p.url })),
+      { "@type": "ListItem", position: parents.length + 2, name: label, item: canonical },
     ],
   };
 }

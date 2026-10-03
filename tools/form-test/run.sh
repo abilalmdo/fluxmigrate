@@ -23,11 +23,16 @@ trap 'kill $SINK_PID 2>/dev/null || true; docker rm -f fm-php >/dev/null 2>&1 ||
 sleep 2
 
 status=0
+reset() { docker exec fm-php sh -c 'rm -f /tmp/fm-form-*'; }
 node tools/form-test/check-endpoint.mjs "$BASE" "$SINK" main || status=1
+for phase in abuse forge spam challenge; do
+  reset   # fresh strikes, rate limits and duplicate memory for each phase
+  node tools/form-test/check-endpoint.mjs "$BASE" "$SINK" "$phase" || status=1
+done
 
 # second phase: SMTP server gone, rate-limit window reset
 kill $SINK_PID; wait $SINK_PID 2>/dev/null || true
-docker exec fm-php sh -c 'rm -f /tmp/fm-form-*'
+reset
 node tools/form-test/check-endpoint.mjs "$BASE" "$SINK" smtp-down || status=1
 
 exit $status

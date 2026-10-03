@@ -91,6 +91,17 @@ const { contact_form_action, footer_email } = config.params;
                 <textarea class="form-field" id="details" name="details" rows="5" maxlength="5000"></textarea>
               </div>
 
+              <!-- Self-hosted captcha: main.js fetches a question from /contact-captcha.php and reveals this -->
+              <div id="captcha-field" hidden>
+                <label class="field-label" for="captcha" id="captcha-label">Security question</label>
+                <input type="hidden" name="captcha_token" value="" />
+                <input class="form-field" id="captcha" name="captcha" type="text" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="captcha-hint" />
+                <p id="captcha-hint" class="mt-2 text-sm text-text-dark">A quick check that you are a person. Digits or words both work.</p>
+              </div>
+              <noscript>
+                <p class="form-note">This form's spam check needs JavaScript. Please turn it on, or email us at <a class="link" href={`mailto:${footer_email}`}>{footer_email}</a>.</p>
+              </noscript>
+
               <button type="submit" class="btn btn-primary w-full py-4 text-lg font-medium">Submit</button>
               <p class="text-center text-sm">We reply within 1 business day.</p>
             </form>

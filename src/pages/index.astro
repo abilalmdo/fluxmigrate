@@ -1,4 +1,5 @@
 ---
+import AiopsTrackCards from "@/components/AiopsTrackCards.astro";
 import Badge from "@/components/Badge.astro";
 import CtaBand from "@/components/CtaBand.astro";
 import GradientBlob from "@/components/GradientBlob.astro";
@@ -7,6 +8,7 @@ import HeroImage from "@/components/HeroImage.astro";
 import Icon from "@/components/Icon.astro";
 import PathCards from "@/components/PathCards.astro";
 import SectionIntro from "@/components/SectionIntro.astro";
+import { aiops } from "@/data/aiops";
 import { home } from "@/data/content";
 import Base from "@/layouts/Base.astro";
 import { organizationSchema, websiteSchema } from "@/lib/site";
@@ -106,7 +108,7 @@ const rows = [caps.slice(0, half), caps.slice(half)];
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {
               home.services.items.map((s) => (
-                <article id={s.id} class="card-tile scroll-mt-32 flex flex-col">
+                <article id={s.id} class:list={["card-tile scroll-mt-32 flex flex-col", (s as { wide?: boolean }).wide && "lg:col-span-3"]}>
                   <Icon name={s.icon} size={56} class="mb-6" />
                   <h3 class="text-h5-sm font-bold">{s.title}</h3>
                   <p class="mt-3 text-text-dark grow">{s.text}</p>
@@ -123,6 +125,22 @@ const rows = [caps.slice(0, half), caps.slice(half)];
                 </article>
               ))
             }
+          </div>
+        </div>
+      </div>
+    </div>
+    <GradientBlob />
+  </section>
+
+  <!-- AIOps -->
+  <section class="section relative overflow-hidden" id="aiops">
+    <div class="container">
+      <div class="section-container">
+        <SectionIntro title={aiops.home.title} text={aiops.home.text} badge={aiops.home.badge} />
+        <div class="section-content">
+          <AiopsTrackCards />
+          <div class="mt-12 flex justify-center">
+            <a class="btn btn-primary" href={aiops.home.button.href}>{aiops.home.button.label}</a>
           </div>
         </div>
       </div>

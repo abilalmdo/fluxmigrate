@@ -4,6 +4,17 @@ import { Resvg } from "@resvg/resvg-js";
 import sharp from "sharp";
 
 import about from "./scenes/about.mjs";
+import {
+  aiopsCloud,
+  aiopsDevsecops,
+  aiopsFinops,
+  aiopsGrc,
+  aiopsMlops,
+  aiopsNetwork,
+  aiopsOverview,
+  aiopsSecurity,
+  aiopsSre,
+} from "./scenes/aiops.mjs";
 import cloud from "./scenes/cloud.mjs";
 import contact from "./scenes/contact.mjs";
 import devops from "./scenes/devops.mjs";
@@ -31,6 +42,15 @@ export const HEROES = {
   industries,
   about,
   contact,
+  "aiops-overview": aiopsOverview,
+  "aiops-sre": aiopsSre,
+  "aiops-security": aiopsSecurity,
+  "aiops-grc": aiopsGrc,
+  "aiops-network": aiopsNetwork,
+  "aiops-cloud": aiopsCloud,
+  "aiops-finops": aiopsFinops,
+  "aiops-devsecops": aiopsDevsecops,
+  "aiops-mlops": aiopsMlops,
 };
 
 function raster(svg, width) {
