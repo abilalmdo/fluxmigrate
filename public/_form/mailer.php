@@ -27,22 +27,29 @@ function fm_site_url($config)
 /**
  * Sends a plain-text mail over SMTP, falling back to the host's mail(). True when one of them accepted it.
  * $extraHeaders: array of name => value (values are stripped of CR/LF).
+ * $html: optional HTML version; $body then becomes the plain-text alternative of a multipart mail.
  */
-function fm_send_mail($config, $to, $subject, $body, $extraHeaders = array())
+function fm_send_mail($config, $to, $subject, $body, $extraHeaders = array(), $html = null)
 {
     require_once __DIR__ . '/phpmailer/Exception.php';
     require_once __DIR__ . '/phpmailer/PHPMailer.php';
     require_once __DIR__ . '/phpmailer/SMTP.php';
 
     $sender = !empty($config['from']) ? $config['from'] : $config['user'];
-    $build = function () use ($config, $sender, $to, $subject, $body, $extraHeaders) {
+    $build = function () use ($config, $sender, $to, $subject, $body, $extraHeaders, $html) {
         $mail = new PHPMailer\PHPMailer\PHPMailer(true);
         $mail->CharSet = 'UTF-8';
         $mail->setFrom($sender, 'FluxMigrate');
         $mail->addAddress($to);
         $mail->Subject = preg_replace('/[\r\n]+/', ' ', $subject);
-        $mail->Body = $body;
-        $mail->isHTML(false);
+        if ($html !== null) {
+            $mail->isHTML(true);
+            $mail->Body = $html;
+            $mail->AltBody = $body;
+        } else {
+            $mail->isHTML(false);
+            $mail->Body = $body;
+        }
         foreach ($extraHeaders as $name => $value) {
             $mail->addCustomHeader($name, preg_replace('/[\r\n]+/', ' ', $value));
         }

@@ -114,7 +114,7 @@ for (const [file, src] of Object.entries(html)) {
 }
 
 // contact form back end (task FM-106): the endpoint, its library and the rules that protect the config
-for (const f of ["contact-submit.php", "contact-captcha.php", "subscribe.php", "subscribe-confirm.php", "subscribe-unsubscribe.php", "_form/guard.php", "_form/mailer.php", "_form/subscribers.php", "_form/.htaccess", "_form/phpmailer/PHPMailer.php", "_form/phpmailer/SMTP.php", "_form/phpmailer/Exception.php"]) {
+for (const f of ["contact-submit.php", "contact-captcha.php", "subscribe.php", "subscribe-confirm.php", "subscribe-unsubscribe.php", "_form/guard.php", "_form/mailer.php", "_form/email-template.php", "brand/email-logo.png", "_form/subscribers.php", "_form/.htaccess", "_form/phpmailer/PHPMailer.php", "_form/phpmailer/SMTP.php", "_form/phpmailer/Exception.php"]) {
   if (!existsSync(join(dist, f))) fail("contact-form", `${f} missing from dist`);
 }
 for (const needle of ['id="captcha-field"', 'name="captcha_token"', 'name="captcha"', 'name="hp_url"']) {

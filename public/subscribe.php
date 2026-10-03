@@ -65,6 +65,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
 require __DIR__ . '/_form/guard.php';
 require __DIR__ . '/_form/mailer.php';
 require __DIR__ . '/_form/subscribers.php';
+require __DIR__ . '/_form/email-template.php';
 
 $config = fm_load_config();
 if ($config === null) {
@@ -187,13 +188,13 @@ try {
             );
         }
         $base = fm_site_url($config);
-        $body = "Please confirm your subscription to FluxMigrate emails.\n\n"
-            . "Confirm: $base/subscribe-confirm.php?t=" . $row['confirm_token'] . "\n\n"
-            . 'You will receive: ' . fm_interest_labels($row['interests']) . "\n\n"
-            . "If you did not ask for this, ignore this email. Nothing happens until the link is opened.\n"
-            . "Never want these emails: $base/subscribe-unsubscribe.php?t=" . $row['unsub_token'] . "\n\n"
-            . "FluxMigrate\n";
-        if (!fm_send_mail($config, $email, 'Confirm your FluxMigrate subscription', $body)) {
+        list($body, $html) = fm_confirmation_email(
+            $base . '/subscribe-confirm.php?t=' . $row['confirm_token'],
+            $base . '/subscribe-unsubscribe.php?t=' . $row['unsub_token'],
+            fm_interest_labels_sentence($row['interests']),
+            $base
+        );
+        if (!fm_send_mail($config, $email, 'Confirm your FluxMigrate subscription', $body, array(), $html)) {
             fm_sub_finish(false, 'send', 502);   // stays pending with no confirm_sent_at, so a retry mails again
         }
         $db->prepare('UPDATE subscribers SET confirm_sent_at = ? WHERE id = ?')->execute(array(fm_now(), $row['id']));

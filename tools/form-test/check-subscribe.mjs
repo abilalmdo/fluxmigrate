@@ -40,7 +40,14 @@ if (phase === "sub-main") {
   const lk = links(mails[0]);
   ok(!!lk.confirm && !!lk.unsub, "mail carries a confirm link and an unsubscribe link");
   ok(/http:\/\/127\.0\.0\.1:8089\/subscribe-confirm\.php/.test(mails[0].data), "links use the configured site URL (not the request's Host)");
-  ok(/You will receive: Blog posts, Newsletter, Service updates/.test(mails[0].data), "mail says what the subscriber will receive");
+  ok(/one click away from blog posts, our newsletter and service updates/.test(mails[0].data), "mail says what the subscriber will receive");
+  // the mail is multipart: an HTML version with a button and a plain-text fallback
+  const raw = mails[0].data;
+  ok(/Content-Type: multipart\/alternative/i.test(raw) && /Content-Type: text\/html/i.test(raw) && /Content-Type: text\/plain/i.test(raw), "mail has both an HTML and a plain-text part");
+  ok(/<a href="http:\/\/127\.0\.0\.1:8089\/subscribe-confirm\.php\?t=[a-f0-9]{32}"[^>]*>Confirm and connect with FluxMigrate/.test(raw), "HTML part has a button linking to the confirm URL");
+  ok(/<img src="http:\/\/127\.0\.0\.1:8089\/brand\/email-logo\.png"[^>]*alt="FluxMigrate"/.test(raw), "HTML part shows the logo from our own site, with alt text");
+  ok(/Cloud infrastructure, engineered for change\./.test(raw) && /Unsubscribe<\/a>/.test(raw), "HTML part carries the closing statement and an unsubscribe link");
+  ok(!/<script|javascript:/i.test(raw) && !/https?:\/\/(?!127\.0\.0\.1:8089|www\.w3\.org)/.test(raw.split(/\r?\n\r?\n/).slice(1).join(" ").replace(/<!DOCTYPE[^>]*>/i, "")), "HTML part has no script and loads nothing from another origin");
   let db = rows();
   ok(db.length === 1 && db[0].status === "pending" && db[0].email === "ada@example.com" && db[0].interests === "blog,newsletter,updates", "row stored as pending, subscribed to all three kinds", JSON.stringify(db));
   ok(db[0].consent_text === "I agree to receive emails from FluxMigrate: blog posts, the newsletter and service updates. I can unsubscribe at any time." && db[0].source_page === "/about.html" && db[0].ip_hash.length === 24, "consent wording, page and hashed IP are recorded");

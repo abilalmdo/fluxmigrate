@@ -103,3 +103,17 @@ function fm_interest_labels($csv)
     }
     return implode(', ', $out);
 }
+
+/** "blog posts, our newsletter and service updates" - for running text. */
+function fm_interest_labels_sentence($csv)
+{
+    $words = array('blog' => 'blog posts', 'newsletter' => 'our newsletter', 'updates' => 'service updates');
+    $out = array();
+    foreach (explode(',', $csv) as $k) {
+        if (isset($words[$k])) {
+            $out[] = $words[$k];
+        }
+    }
+    $last = array_pop($out);
+    return $out ? implode(', ', $out) . ' and ' . $last : (string) $last;
+}

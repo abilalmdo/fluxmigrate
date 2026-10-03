@@ -127,9 +127,16 @@ if (phase === "main") {
   // a number can be typed as digits or as a word
   // (pick a pooled challenge whose answer is 0-10, which has a word form, without using up the others)
   const wordSet = Object.entries(WORDS);
-  const at = pool.findIndex((c) => wordSet.some(([, n]) => String(n) === c.captcha));
-  if (at < 0) throw new Error("no pooled challenge with a word-form answer");
-  const item = pool.splice(at, 1)[0];
+  const hasWord = (c) => wordSet.some(([, n]) => String(n) === c.captcha);
+  let item = pool.find(hasWord);
+  if (item) pool.splice(pool.indexOf(item), 1);
+  for (let i = 0; i < 3 && !item; i++) {
+    // none in the pool (about a 1-in-15 draw): fetch a few more, then let them age past the 3 s minimum
+    const c = await getChallenge();
+    const cand = { captcha_token: c.token, captcha: solve(c.question) };
+    if (hasWord(cand)) { item = cand; await sleep(3200); }
+  }
+  if (!item) throw new Error("no challenge with a word-form answer found");
   const wordAns = wordSet.find(([, n]) => String(n) === item.captcha)[0];
   r = await post({ ...valid({ name: "Word Answer" }), ...item, captcha: ` ${wordAns.toUpperCase()}. ` });
   ok((await r.json()).ok === true, `answer "${wordAns}" (word, upper case, padded) is accepted`);
