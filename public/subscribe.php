@@ -191,7 +191,6 @@ try {
         list($body, $html) = fm_confirmation_email(
             $base . '/subscribe-confirm.php?t=' . $row['confirm_token'],
             $base . '/subscribe-unsubscribe.php?t=' . $row['unsub_token'],
-            fm_interest_labels_sentence($row['interests']),
             $base
         );
         if (!fm_send_mail($config, $email, 'Confirm your FluxMigrate subscription', $body, array(), $html)) {

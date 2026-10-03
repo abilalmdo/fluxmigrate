@@ -10,8 +10,44 @@
  * Library code: included from disk, never requested over HTTP (see _form/.htaccess).
  */
 
-const FM_MAIL_TAGLINE = 'Cloud infrastructure, engineered for change.';
-const FM_MAIL_STATEMENT = 'We help teams migrate, modernise and run their infrastructure with confidence, as projects or as an extension of your own engineering team.';
+/**
+ * Welcome wording. Each email picks one variant at random, so different people get different words.
+ * A variant is one welcome line, one closing tagline and one closing statement; they always travel together.
+ * Add, change or remove entries freely (keep at least one). Rules for every entry: no client names, no numbers,
+ * no "best/leading/trusted by" claims, no mention of blogs or newsletters, plain ASCII (the template escapes it).
+ */
+const FM_MAIL_VARIANTS = array(
+    array(
+        'intro' => 'You are one click away from stepping into a world of expert cloud, DevOps and reliability engineering insight, built to help your business move faster and run with confidence.',
+        'tagline' => 'Cloud infrastructure, engineered for change.',
+        'statement' => 'We help teams migrate, modernise and run their infrastructure with confidence, as projects or as an extension of your own engineering team.',
+    ),
+    array(
+        'intro' => 'One click opens the door to expert cloud, DevOps and reliability engineering, built around your business.',
+        'tagline' => 'Migrate with confidence. Operate with calm.',
+        'statement' => 'Cloud, DevOps and reliability engineering, delivered as projects or as part of your team.',
+    ),
+    array(
+        'intro' => 'You are one click away from smarter, calmer infrastructure.',
+        'tagline' => 'Your infrastructure, our engineers.',
+        'statement' => 'Working alongside your team, from the first migration to day-to-day reliability.',
+    ),
+    array(
+        'intro' => 'Welcome aboard. One click connects you with the engineering expertise behind your next migration.',
+        'tagline' => 'Change is constant. Migration should be calm.',
+        'statement' => 'We plan, build and run cloud and platform changes so your team can keep shipping.',
+    ),
+    array(
+        'intro' => 'You are one click away from infrastructure ideas that help your business move with confidence.',
+        'tagline' => 'Modern infrastructure, built to adapt.',
+        'statement' => 'From cloud migration to site reliability, we help teams modernise without slowing down.',
+    ),
+    array(
+        'intro' => 'Welcome. One click starts the conversation about faster, safer, more reliable infrastructure.',
+        'tagline' => 'Faster to change. Safer to run.',
+        'statement' => 'Practical cloud, DevOps and reliability engineering for teams that cannot afford downtime.',
+    ),
+);
 const FM_MAIL_BUTTON = 'Confirm and connect with FluxMigrate';
 
 function fm_h($s)
@@ -19,14 +55,18 @@ function fm_h($s)
     return htmlspecialchars((string) $s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-/** Returns array(plainText, html). All three URLs are built by the caller from config, never from the request. */
-function fm_confirmation_email($confirmUrl, $unsubUrl, $interestsLabel, $siteUrl)
+/**
+ * Returns array(plainText, html). All three URLs are built by the caller from config, never from the request.
+ * $variant: index into FM_MAIL_VARIANTS; null (the normal case) picks one at random.
+ */
+function fm_confirmation_email($confirmUrl, $unsubUrl, $siteUrl, $variant = null)
 {
+    $v = FM_MAIL_VARIANTS[$variant !== null ? ((int) $variant) % count(FM_MAIL_VARIANTS) : random_int(0, count(FM_MAIL_VARIANTS) - 1)];
     $text = "Welcome to FluxMigrate\n\n"
-        . "You are one click away from " . $interestsLabel . " on cloud migration, DevOps and reliability engineering.\n\n"
+        . $v['intro'] . "\n\n"
         . FM_MAIL_BUTTON . ":\n$confirmUrl\n\n"
         . "If you did not ask for this, ignore this email. Nothing happens until the link is opened.\n\n"
-        . "--\n" . FM_MAIL_TAGLINE . "\n" . FM_MAIL_STATEMENT . "\n\n"
+        . "--\n" . $v['tagline'] . "\n" . $v['statement'] . "\n\n"
         . "FluxMigrate - $siteUrl\n"
         . "Do not want these emails? $unsubUrl\n";
 
@@ -34,9 +74,9 @@ function fm_confirmation_email($confirmUrl, $unsubUrl, $interestsLabel, $siteUrl
     $confirm = fm_h($confirmUrl);
     $unsub = fm_h($unsubUrl);
     $site = fm_h($siteUrl);
-    $interests = fm_h($interestsLabel);
-    $tagline = fm_h(FM_MAIL_TAGLINE);
-    $statement = fm_h(FM_MAIL_STATEMENT);
+    $intro = fm_h($v['intro']);
+    $tagline = fm_h($v['tagline']);
+    $statement = fm_h($v['statement']);
     $button = fm_h(FM_MAIL_BUTTON);
 
     $font = "font-family:'Segoe UI',Helvetica,Arial,sans-serif;";
@@ -60,7 +100,7 @@ function fm_confirmation_email($confirmUrl, $unsubUrl, $interestsLabel, $siteUrl
     </td></tr>
     <tr><td style="padding:24px 40px 0 40px;{$font}color:#1a1530;">
       <h1 style="margin:0 0 12px 0;font-size:26px;line-height:1.25;font-weight:700;color:#1a1530;">Welcome to FluxMigrate</h1>
-      <p style="margin:0 0 8px 0;font-size:16px;line-height:1.6;color:#3b3654;">You are one click away from $interests on cloud migration, DevOps and reliability engineering.</p>
+      <p style="margin:0 0 8px 0;font-size:16px;line-height:1.6;color:#3b3654;">$intro</p>
     </td></tr>
     <tr><td align="left" style="padding:20px 40px 8px 40px;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0">
