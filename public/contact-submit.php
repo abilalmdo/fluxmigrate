@@ -33,7 +33,7 @@ function fm_finish($ok, $code, $status = 200)
     global $wantsJson;
     $messages = array(
         'invalid' => 'Please fill in your name, company and a valid email address.',
-        'freemail' => 'Please use your company email address. Personal addresses such as Gmail, Yahoo or Outlook are not accepted. If you do not have one, email info@fluxmigrate.com.',
+        'freemail' => 'Please use your company email address. Personal addresses such as Gmail, Yahoo or Outlook are not accepted.',
         'disposable' => 'Temporary email addresses are not accepted. Please use your company email address, or email info@fluxmigrate.com.',
         'nodomain' => 'We could not find a mail server for that email domain. Please check the address, or email info@fluxmigrate.com.',
         'rate' => 'Too many messages from your connection. Please try again later, or email info@fluxmigrate.com.',

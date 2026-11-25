@@ -227,7 +227,7 @@
         email.setCustomValidity(bad ? "Please use your company email address." : "");
         email.setAttribute("aria-invalid", bad ? "true" : "false");
         hint.hidden = !bad;
-        hint.textContent = bad ? "Please use your company email address. Personal addresses such as Gmail, Yahoo or Outlook are not accepted. No company email? Write to info@fluxmigrate.com." : "";
+        hint.textContent = bad ? "Please use your company email address. Personal addresses such as Gmail, Yahoo or Outlook are not accepted." : "";
       };
       email.addEventListener("blur", check);
       // Keep the validity state current on every edit, so the browser's own check blocks the submit.
