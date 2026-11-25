@@ -41,7 +41,7 @@ async function fillPool(n) {
   await sleep(3200);
 }
 const valid = (over = {}) => ({
-  ts: ago(6000), hp_url: "", ...(pool.length ? pool.pop() : {}), name: "Ada Lovelace", company: "Analytical Engines Ltd", email: "ada@example.com",
+  ts: ago(6000), hp_url: "", ...(pool.length && !over.nopool ? pool.pop() : {}), name: "Ada Lovelace", company: "Analytical Engines Ltd", email: "ada@example.com",
   role: "CTO", need: "Cloud Migration", env: "AWS, Kubernetes", count: "2–3", engagement: "Project",
   details: "Line one.\nLine two — with a dash and ünïcode.", ...over,
 });
@@ -52,6 +52,17 @@ const post = (fields, { json = true, origin = ORIGIN } = {}) =>
     headers: { ...(json ? { Accept: "application/json" } : {}), ...(origin ? { Origin: origin } : {}), "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams(fields).toString(),
   });
+
+if (phase === "email") {
+  await fillPool(8);
+  let r, j;
+  // company domains that merely look similar must pass
+  for (const addr of ["ada@gmail-consulting.example.com", "ada@yahooligans.com", "ada@outlooks.io", "ada@mylive.com", "ada@analyticalengines.co.uk"]) {
+    r = await post(valid({ email: addr, name: `Legit ${addr}` }));
+    j = await r.json();
+    ok(r.status === 200 && j.ok === true, `company-style address ${addr} passes`, `${r.status} ${j.code}`);
+  }
+}
 
 if (phase === "main") {
   await fillPool(26);
@@ -95,6 +106,26 @@ if (phase === "main") {
     j = await r.json();
     ok(r.status === 422 && j.ok === false && /name, company and a valid email/.test(j.message), `invalid ${k}=${JSON.stringify(v)} -> 422 with message`);
   }
+  // 4b - business email only (FM-110): public, disposable and dead domains are refused, no strike, no mail
+  const beforeFree = sink().length;
+  const refused = [
+    ["freemail", "dev@gmail.com"], ["freemail", "Dev@GMAIL.COM"], ["freemail", "dev@googlemail.com"],
+    ["freemail", "dev@yahoo.com"], ["freemail", "dev@yahoo.co.uk"], ["freemail", "dev@yahoo.com.br"],
+    ["freemail", "dev@hotmail.com"], ["freemail", "dev@hotmail.fr"], ["freemail", "dev@outlook.com"],
+    ["freemail", "dev@outlook.de"], ["freemail", "dev@live.com"], ["freemail", "dev@icloud.com"],
+    ["freemail", "dev@proton.me"], ["freemail", "dev@mail.gmail.com"],
+    ["freemail", "dev@gmx.de"], ["freemail", "dev@yandex.ru"], ["freemail", "dev@qq.com"],
+    ["disposable", "dev@mailinator.com"], ["disposable", "dev@sub.mailinator.com"], ["disposable", "dev@guerrillamail.com"],
+    ["nodomain", "dev@company.invalid"], ["nodomain", "dev@corp.test"],
+  ];
+  for (const [code, addr] of refused) {
+    r = await post(valid({ email: addr, nopool: true }));
+    j = await r.json();
+    ok(r.status === 422 && j.ok === false && j.code === code, `email ${addr} -> ${code}`, `${r.status} ${j.code}`);
+  }
+  r = await post(valid({ email: "dev@gmail.com", nopool: true }), { json: false });
+  ok(r.status === 303 && /error=freemail/.test(r.headers.get("location") || ""), "plain post with Gmail -> 303 back to contact page with error=freemail", r.headers.get("location"));
+  ok(sink().length === beforeFree, "refused business-email checks sent no mail");
   r = await post(valid({ details: "x".repeat(5001) }));
   ok(r.status === 422, "over-long message -> 422");
   r = await post(valid({ name: "n".repeat(101) }));

@@ -37,6 +37,8 @@ if (env.SITE_URL) config.site_url = env.SITE_URL; // links in newsletter mails; 
 if (env.DATA_DIR) config.data_dir = env.DATA_DIR; // newsletter database folder; default: "fm-data" beside the web root
 if (env.ALLOWED_HOSTS) config.allowed_hosts = env.ALLOWED_HOSTS.split(",").map((h) => h.trim().toLowerCase());
 
+if (env.MX_CHECK === "0") config.mx_check = false; // tests only: no DNS lookup of the visitor's email domain
+
 const payload = Buffer.from(JSON.stringify(config)).toString("base64");
 writeFileSync(
   join(dist, "mail-config.php"),

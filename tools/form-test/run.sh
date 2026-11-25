@@ -13,7 +13,7 @@ PORT=8089
 BASE="http://127.0.0.1:$PORT"
 
 rm -rf "$SITE" && cp -r dist "$SITE"
-DIST_DIR="$SITE" SMTP_HOST=127.0.0.1 SMTP_PORT=2525 SMTP_SECURE=none SMTP_USER=forms@fluxmigrate.com   SMTP_PASSWORD="p\"a'ss\$w\ord;<?php echo 1; ?>" ALLOWED_HOSTS="127.0.0.1,localhost" DATA_DIR=/tmp/fm-data-test SITE_URL="http://127.0.0.1:8089"   node tools/write-mail-config.mjs
+DIST_DIR="$SITE" SMTP_HOST=127.0.0.1 SMTP_PORT=2525 SMTP_SECURE=none SMTP_USER=forms@fluxmigrate.com   SMTP_PASSWORD="p\"a'ss\$w\ord;<?php echo 1; ?>" ALLOWED_HOSTS="127.0.0.1,localhost" MX_CHECK=0 DATA_DIR=/tmp/fm-data-test SITE_URL="http://127.0.0.1:8089"   node tools/write-mail-config.mjs
 
 docker rm -f fm-php >/dev/null 2>&1 || true
 docker run -d --rm --name fm-php --network host -v "$SITE":/site:ro php:8.3-cli php -S "127.0.0.1:$PORT" -t /site >/dev/null
@@ -25,7 +25,7 @@ sleep 2
 status=0
 reset() { docker exec fm-php sh -c 'rm -rf /tmp/fm-form-* /tmp/fm-data-test'; }
 node tools/form-test/check-endpoint.mjs "$BASE" "$SINK" main || status=1
-for phase in abuse forge spam challenge; do
+for phase in email abuse forge spam challenge; do
   reset   # fresh strikes, rate limits and duplicate memory for each phase
   node tools/form-test/check-endpoint.mjs "$BASE" "$SINK" "$phase" || status=1
 done

@@ -236,6 +236,13 @@ contact.html --fetch--> contact-submit.php --SMTP--> mailbox (forms@) --> info@f
   5. **Duplicates.** The same email, name, company and message within 24 h is thanked but not sent twice.
   6. **Rate limits.** 5 enquiries per IP per hour, 60 overall, 30 captcha questions per IP per hour; length limits; CR/LF stripped
      from every header value. Counters live in the system temp dir (client IPs only as a keyed hash).
+  7. **Business email only (FM-110).** `_form/emailcheck.php` refuses public mailbox providers (Gmail, Yahoo, Hotmail, Outlook, iCloud,
+     Proton, GMX, Yandex, QQ ... including country variants like `yahoo.co.uk`, and subdomains), disposable-mail services
+     (`_form/disposable-domains.txt`, about 10k domains from the CC0 disposable-email-domains list; refresh by downloading the new file)
+     and domains with no mail server (DNS MX/A/AAAA lookup; reserved names such as `.invalid` always fail). Codes `freemail`,
+     `disposable`, `nodomain`; visible message, no strike. Edit `FM_FREEMAIL_DOMAINS` / `FM_FREEMAIL_BRANDS` to change the list.
+     `main.js` repeats a short list for an instant hint under the field; the server is the only real gate. The test config sets
+     `MX_CHECK=0` (no DNS in the test container).
   No third-party script or service is involved. A JavaScript-off visitor cannot pass the captcha; the page tells them to email.
   The limits are per `REMOTE_ADDR`: if a CDN or proxy is ever put in front of the site, add trusted `X-Forwarded-For` handling
   in `fm_client_key()` or every visitor will share one counter.

@@ -52,7 +52,8 @@ const { contact_form_action, footer_email } = config.params;
                 </div>
                 <div>
                   <label class="field-label" for="email">Business Email</label>
-                  <input class="form-field" id="email" name="email" type="email" maxlength="254" autocomplete="email" required />
+                  <input class="form-field" id="email" name="email" type="email" maxlength="254" autocomplete="email" aria-describedby="email-hint" required />
+                  <p id="email-hint" class="field-error" hidden></p>
                 </div>
                 <div>
                   <label class="field-label" for="role">Role</label>

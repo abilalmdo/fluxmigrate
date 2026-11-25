@@ -33,6 +33,9 @@ function fm_finish($ok, $code, $status = 200)
     global $wantsJson;
     $messages = array(
         'invalid' => 'Please fill in your name, company and a valid email address.',
+        'freemail' => 'Please use your company email address. Personal addresses such as Gmail, Yahoo or Outlook are not accepted. If you do not have one, email info@fluxmigrate.com.',
+        'disposable' => 'Temporary email addresses are not accepted. Please use your company email address, or email info@fluxmigrate.com.',
+        'nodomain' => 'We could not find a mail server for that email domain. Please check the address, or email info@fluxmigrate.com.',
         'rate' => 'Too many messages from your connection. Please try again later, or email info@fluxmigrate.com.',
         'captcha' => 'That answer was not right. Please answer the new question and try again.',
         'expired' => 'The security question expired. Please answer the new question and try again.',
@@ -133,6 +136,15 @@ foreach (array($name, $company, $email, $role, $need, $env, $count, $engagement,
 }
 if ($name === '' || $company === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     fm_finish(false, 'invalid', 422);
+}
+
+// Business addresses only (FM-110): no public mailbox providers, disposable services or dead domains.
+// No strike: a real person may type a personal address by habit. Checked before the captcha so the
+// visitor keeps their answer.
+require __DIR__ . '/_form/emailcheck.php';
+$emailProblem = fm_email_domain_problem($email, !isset($config['mx_check']) || $config['mx_check'] !== false);
+if ($emailProblem !== null) {
+    fm_finish(false, $emailProblem, 422);
 }
 
 // --- captcha ---------------------------------------------------------------------------------

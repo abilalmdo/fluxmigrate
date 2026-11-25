@@ -182,7 +182,7 @@
             return;
           }
           showError(data.message);
-          if (!["invalid", "consent"].includes(data.code)) {
+          if (!["invalid", "consent", "freemail", "disposable", "nodomain"].includes(data.code)) {
             // The server spends a token on every attempt that got past validation, so ask for a fresh question
             captchaToken.value = "";
             await loadCaptcha();
@@ -202,6 +202,42 @@
     }
 
     wireForm({ form: "contact-form", status: "form-status", captcha: "captcha", redirect: "/thank-you.html" });
+
+    // Business email only (FM-110). Instant hint for the visitor; the server repeats the check and has the
+    // full list (public/_form/emailcheck.php), this one covers the common providers.
+    (function () {
+      const email = document.getElementById("email");
+      const hint = document.getElementById("email-hint");
+      if (!email || !hint) return;
+      const exact = new Set(["gmail.com", "googlemail.com", "outlook.com", "hotmail.com", "live.com", "msn.com", "yahoo.com", "ymail.com", "rocketmail.com", "aol.com", "icloud.com", "me.com", "mac.com", "proton.me", "protonmail.com", "pm.me", "tutanota.com", "mail.com", "zoho.com", "gmx.com", "gmx.net", "web.de", "yandex.com", "yandex.ru", "mail.ru", "qq.com", "163.com", "126.com", "rediffmail.com", "fastmail.com", "hey.com", "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com", "yopmail.com"]);
+      const brands = new Set(["yahoo", "hotmail", "outlook", "live", "gmx", "yandex", "msn", "icloud", "protonmail", "zoho", "aol"]);
+      const isFree = (domain) => {
+        const labels = domain.split(".");
+        for (let i = 0; i < labels.length - 1; i++) {
+          const rest = labels.slice(i);
+          if (exact.has(rest.join("."))) return true;
+          if (brands.has(rest[0]) && (rest.length === 2 || (rest.length === 3 && rest[1].length <= 3 && rest[2].length === 2))) return true;
+        }
+        return false;
+      };
+      const check = () => {
+        const at = email.value.lastIndexOf("@");
+        const domain = at > 0 ? email.value.slice(at + 1).trim().toLowerCase().replace(/\.$/, "") : "";
+        const bad = domain.includes(".") && isFree(domain);
+        email.setCustomValidity(bad ? "Please use your company email address." : "");
+        email.setAttribute("aria-invalid", bad ? "true" : "false");
+        hint.hidden = !bad;
+        hint.textContent = bad ? "Please use your company email address. Personal addresses such as Gmail, Yahoo or Outlook are not accepted. No company email? Write to info@fluxmigrate.com." : "";
+      };
+      email.addEventListener("blur", check);
+      // Keep the validity state current on every edit, so the browser's own check blocks the submit.
+      email.addEventListener("input", () => {
+        const wasShown = !hint.hidden;
+        check();
+        if (!wasShown) hint.hidden = true; // do not nag while typing; show on blur or submit
+      });
+      email.addEventListener("change", check);
+    })();
 
     // custom dropdowns for the contact form selects. The native <select> stays in the DOM (hidden) so the form
     // still posts it and works without script; the listbox below only mirrors it.
