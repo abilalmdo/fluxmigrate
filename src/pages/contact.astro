@@ -90,7 +90,8 @@ const { contact_form_action, footer_email } = config.params;
 
               <div>
                 <label class="field-label" for="details">Tell us about your requirements</label>
-                <textarea class="form-field" id="details" name="details" rows="5" maxlength="2000" aria-describedby="details-count"></textarea>
+                <textarea class="form-field" id="details" name="details" rows="5" maxlength="2000" aria-describedby="details-hint details-count"></textarea>
+                <p id="details-hint" class="field-error" hidden></p>
                 <p id="details-count" class="mt-2 text-right text-sm text-text-dark" data-limit="2000">2000 characters left</p>
               </div>
 

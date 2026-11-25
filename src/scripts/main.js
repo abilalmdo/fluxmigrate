@@ -237,6 +237,32 @@
         if (!wasShown) hint.hidden = true; // do not nag while typing; show on blur or submit
       });
       email.addEventListener("change", check);
+
+      // Same rule for personal addresses typed into the message and the other text fields.
+      const mailPattern = /[A-Za-z0-9._%+-]+\s*(?:@|\(\s*at\s*\)|\[\s*at\s*\]|\{\s*at\s*\})\s*([A-Za-z0-9-]+(?:\s*(?:\.|\(\s*dot\s*\)|\[\s*dot\s*\]|\{\s*dot\s*\})\s*[A-Za-z0-9-]+)+)/gi;
+      const hasPublicMail = (text) => {
+        for (const m of text.matchAll(mailPattern)) {
+          const d = m[1].replace(/[([{]\s*dot\s*[)\]}]/gi, ".").replace(/\s+/g, "").toLowerCase();
+          if (isFree(d)) return true;
+        }
+        return false;
+      };
+      const watch = (id, hintId) => {
+        const field = document.getElementById(id);
+        const note = document.getElementById(hintId);
+        if (!field || !note) return;
+        const run = (show) => {
+          const bad = hasPublicMail(field.value);
+          field.setCustomValidity(bad ? "Please remove personal email addresses." : "");
+          field.setAttribute("aria-invalid", bad ? "true" : "false");
+          note.hidden = !(bad && show);
+          note.textContent = bad && show ? "Please remove personal email addresses (Gmail, Yahoo, Outlook and similar). Only company email addresses are accepted." : "";
+        };
+        field.addEventListener("input", () => run(!note.hidden));
+        field.addEventListener("blur", () => run(true));
+        field.addEventListener("change", () => run(true));
+      };
+      watch("details", "details-hint");
     })();
 
     // custom dropdowns for the contact form selects. The native <select> stays in the DOM (hidden) so the form

@@ -148,3 +148,23 @@ function fm_email_domain_problem($email, $checkDns = true)
     }
     return null;
 }
+
+/**
+ * Public or disposable addresses written inside free text (message, company, role ...).
+ * Catches name@gmail.com, name (at) gmail (dot) com, name[at]yahoo.co.uk. Returns true on a hit.
+ * No DNS lookup: this only looks for known provider domains.
+ */
+function fm_text_has_public_email($text)
+{
+    $pattern = '/[A-Za-z0-9._%+\-]+\s*(?:@|\(\s*at\s*\)|\[\s*at\s*\]|\{\s*at\s*\})\s*([A-Za-z0-9\-]+(?:\s*(?:\.|\(\s*dot\s*\)|\[\s*dot\s*\]|\{\s*dot\s*\})\s*[A-Za-z0-9\-]+)+)/i';
+    if (!preg_match_all($pattern, $text, $m)) {
+        return false;
+    }
+    foreach ($m[1] as $raw) {
+        $domain = strtolower(preg_replace('/\s+/', '', preg_replace('/[\(\[\{]\s*dot\s*[\)\]\}]/i', '.', $raw)));
+        if (fm_is_freemail($domain) || fm_is_disposable($domain)) {
+            return true;
+        }
+    }
+    return false;
+}

@@ -57,7 +57,10 @@ if (phase === "email") {
   await fillPool(8);
   let r, j;
   // company domains that merely look similar must pass
-  for (const addr of ["ada@gmail-consulting.example.com", "ada@yahooligans.com", "ada@outlooks.io", "ada@mylive.com", "ada@analyticalengines.co.uk"]) {
+  r = await post(valid({ details: "Please reply to cto@analyticalengines.co.uk or call us. Our gmail.com migration is done." }));
+  j = await r.json();
+  ok(r.status === 200 && j.ok === true, "company email inside the message is allowed", `${r.status} ${j.code}`);
+  for (const addr of ["ada@gmail-consulting.example.com", "ada@yahooligans.com", "ada@mylive.com", "ada@analyticalengines.co.uk"]) {
     r = await post(valid({ email: addr, name: `Legit ${addr}` }));
     j = await r.json();
     ok(r.status === 200 && j.ok === true, `company-style address ${addr} passes`, `${r.status} ${j.code}`);
@@ -126,6 +129,14 @@ if (phase === "main") {
   r = await post(valid({ email: "dev@gmail.com", nopool: true }), { json: false });
   ok(r.status === 303 && /error=freemail/.test(r.headers.get("location") || ""), "plain post with Gmail -> 303 back to contact page with error=freemail", r.headers.get("location"));
   ok(sink().length === beforeFree, "refused business-email checks sent no mail");
+  for (const text of ["Reach me at dev@gmail.com please", "mail: dev (at) yahoo (dot) com", "dev[at]hotmail[dot]co[dot]uk", "x@MAILINATOR.com ok?", "line1\nmy.name+tag@outlook.com\nline3"]) {
+    r = await post(valid({ details: text, nopool: true }));
+    j = await r.json();
+    ok(r.status === 422 && j.code === "freemailtext", `public email in message ${JSON.stringify(text)} -> freemailtext`, `${r.status} ${j.code}`);
+  }
+  r = await post(valid({ company: "Acme dev@gmail.com", nopool: true }));
+  j = await r.json();
+  ok(r.status === 422 && j.code === "freemailtext", "public email in company field -> freemailtext", `${r.status} ${j.code}`);
   r = await post(valid({ details: "x".repeat(5001) }));
   ok(r.status === 422, "over-long message -> 422");
   r = await post(valid({ name: "n".repeat(101) }));

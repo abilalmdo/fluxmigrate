@@ -35,6 +35,7 @@ function fm_finish($ok, $code, $status = 200)
         'invalid' => 'Please fill in your name, company and a valid email address.',
         'freemail' => 'Please use your company email address. Personal addresses such as Gmail, Yahoo or Outlook are not accepted.',
         'disposable' => 'Temporary email addresses are not accepted. Please use your company email address, or email info@fluxmigrate.com.',
+        'freemailtext' => 'Please remove personal email addresses (Gmail, Yahoo, Outlook and similar) from your message. Only company email addresses are accepted.',
         'nodomain' => 'We could not find a mail server for that email domain. Please check the address, or email info@fluxmigrate.com.',
         'rate' => 'Too many messages from your connection. Please try again later, or email info@fluxmigrate.com.',
         'captcha' => 'That answer was not right. Please answer the new question and try again.',
@@ -145,6 +146,12 @@ require __DIR__ . '/_form/emailcheck.php';
 $emailProblem = fm_email_domain_problem($email, !isset($config['mx_check']) || $config['mx_check'] !== false);
 if ($emailProblem !== null) {
     fm_finish(false, $emailProblem, 422);
+}
+// The same rule for addresses typed into the message or any other field.
+foreach (array($name, $company, $role, $need, $env, $count, $engagement, $details) as $text) {
+    if (fm_text_has_public_email($text)) {
+        fm_finish(false, 'freemailtext', 422);
+    }
 }
 
 // --- captcha ---------------------------------------------------------------------------------
